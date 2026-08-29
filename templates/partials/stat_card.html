@@ -1,0 +1,6 @@
+<div class="bg-white rounded-2xl p-5 shadow-soft border hover:shadow-softLg hover:-translate-y-0.5 transition relative overflow-hidden">
+  <div class="absolute top-0 right-0 w-16 h-16 bg-{{ color|default:'daneh' }}-50 rounded-bl-[2rem] grid place-items-center text-xl">{{ icon }}</div>
+  <div class="text-xs font-bold text-zinc-500">{{ label }}</div>
+  <div class="text-3xl font-black mt-6">{{ value }}</div>
+  <div class="text-xs mt-1 {% if trend_color %}{{ trend_color }}{% else %}text-zinc-400{% endif %}">{{ trend }}</div>
+</div>

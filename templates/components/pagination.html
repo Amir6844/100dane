@@ -1,0 +1,7 @@
+{% if is_paginated %}
+<div class="flex justify-center items-center gap-2 mt-6">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="px-4 py-2 rounded-xl border bg-white font-bold hover:bg-zinc-50">قبلی</a>{% else %}<span class="px-4 py-2 rounded-xl border bg-zinc-50 text-zinc-400">قبلی</span>{% endif %}
+  <span class="px-4 py-2 bg-zinc-900 text-white rounded-xl font-mono text-sm">{{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="px-4 py-2 rounded-xl border bg-white font-bold hover:bg-zinc-50">بعدی</a>{% else %}<span class="px-4 py-2 rounded-xl border bg-zinc-50 text-zinc-400">بعدی</span>{% endif %}
+</div>
+{% endif %}

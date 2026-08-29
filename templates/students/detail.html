@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load persian %}
+{% block title %}پروفایل {{ student.get_full_name|default:student.username }}{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto">
+  <a href="{% url 'classes:detail' classroom.pk %}?tab=students" class="inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-daneh-600">← بازگشت به کلاس</a>
+  <div class="mt-4 bg-white rounded-[2rem] p-8 shadow-soft border relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-daneh-600 to-barg-500"></div>
+    <div class="flex flex-wrap gap-6">
+      <span class="w-20 h-20 rounded-2xl bg-daneh-100 text-daneh-700 grid place-items-center text-2xl font-black shrink-0">{{ student.first_name|default:student.username|slice:":1" }}</span>
+      <div class="flex-1 min-w-[240px]">
+        <h1 class="text-2xl font-black">{{ student.get_full_name|default:student.username }}</h1>
+        <p class="text-sm text-zinc-500 mt-1">کد: {{ student.student_code|default:"—"|fa_digits }} • کلاس {{ classroom.name }} • {{ classroom.get_grade_level_display }}</p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          {% for g in groups %}<span class="text-xs bg-barg-100 text-green-700 px-2.5 py-1 rounded-full font-bold">{{ g.name }}</span>{% empty %}<span class="text-xs text-zinc-400">بدون گروه</span>{% endfor %}
+        </div>
+      </div>
+      <div class="flex gap-2 self-start">
+        <a href="{% url 'scores:report' classroom.pk %}?student={{ student.pk }}" class="px-5 py-2.5 rounded-full bg-daneh-600 text-white text-sm font-black">📊 کارنامه</a>
+      </div>
+    </div>
+
+    <div class="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-cream-50 rounded-2xl p-5 border text-center"><div class="text-xs text-zinc-500">میانگین</div><div class="text-2xl font-black mt-1" style="color: {{ avg|avg_color }}">{{ avg|default:"—"|fa_digits }}</div><div class="text-xs text-zinc-400">از ۲۰</div></div>
+      <div class="bg-cream-50 rounded-2xl p-5 border text-center"><div class="text-xs text-zinc-500">بیشترین</div><div class="text-2xl font-black mt-1">{{ highest|default:"—"|fa_digits }}</div><div class="text-xs text-zinc-400">نمره</div></div>
+      <div class="bg-cream-50 rounded-2xl p-5 border text-center"><div class="text-xs text-zinc-500">کمترین</div><div class="text-2xl font-black mt-1">{{ lowest|default:"—"|fa_digits }}</div><div class="text-xs text-zinc-400">نمره</div></div>
+      <div class="bg-cream-50 rounded-2xl p-5 border text-center"><div class="text-xs text-zinc-500">تعداد آزمون</div><div class="text-2xl font-black mt-1">{{ exam_count|fa_digits }}</div><div class="text-xs text-zinc-400">آزمون</div></div>
+    </div>
+
+    <div class="mt-6">
+      <h3 class="font-black">نمرات اخیر</h3>
+      <div class="mt-3 space-y-2 max-h-[320px] overflow-auto pr-1">
+        {% for sc in scores %}
+        <div class="flex justify-between items-center p-3 rounded-xl border bg-zinc-50 hover:bg-white transition">
+          <div><div class="font-bold text-sm">{{ sc.exam.title }}</div><div class="text-xs text-zinc-500">{{ sc.exam.get_exam_type_display }} • {{ sc.exam.date|default:"" }}</div></div>
+          <span class="px-4 py-1.5 rounded-full text-white text-sm font-black" style="background: {{ sc.value|avg_color }}">{{ sc.value|fa_digits }}</span>
+        </div>
+        {% empty %}<div class="text-sm text-zinc-400 text-center py-6 border-2 border-dashed rounded-2xl">هنوز نمره‌ای ثبت نشده</div>{% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

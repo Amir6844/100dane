@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load persian %}
+{% block title %}{{ classroom.name }} - ۱۰۰دانه{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <div class="bg-white rounded-[2rem] overflow-hidden shadow-soft border">
+    <div class="h-36 relative" style="background: linear-gradient(135deg, {{ classroom.color }}, #851B37)">
+      <div class="absolute inset-0 seed-pattern opacity-20"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+      <div class="absolute bottom-4 right-6 text-white flex gap-4 items-end">
+        <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur grid place-items-center text-2xl border border-white/30">🍎</div>
+        <div><h1 class="text-2xl font-black">{{ classroom.name }}</h1><p class="text-sm opacity-85">{{ classroom.get_grade_level_display }} • {{ classroom.teacher.get_full_name|default:classroom.teacher.username }} • {{ classroom.students_count|fa_digits }} دانش‌آموز</p></div>
+      </div>
+      {% if classroom.cover %}<img src="{{ classroom.cover.url }}" class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-40">{% endif %}
+    </div>
+    <div class="px-6 py-4 flex flex-wrap gap-3 justify-between items-center bg-cream-50 border-t">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-sm font-black">کد دعوت:</span><code class="bg-white border px-3 py-1.5 rounded-full font-mono tracking-widest font-black">{{ classroom.invite_code }}</code>
+        <button onclick="copyInvite('{{ classroom.invite_code }}')" class="text-xs px-3.5 py-1.5 rounded-full bg-zinc-900 text-white font-bold hover:bg-black transition">📋 کپی</button>
+        {% if user == classroom.teacher %}<form method="post" action="{% url 'classes:regenerate_invite' classroom.pk %}">{% csrf_token %}<button class="text-xs px-3.5 py-1.5 rounded-full border bg-white font-bold hover:bg-zinc-50">تولید مجدد</button></form>{% endif %}
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <a href="{% url 'scores:export' classroom.pk %}" onclick="return loadingBtn(this)" class="px-4 py-2 rounded-full bg-barg-500 text-white text-sm font-bold hover:bg-green-700 shadow-sm">📥 خروجی اکسل کامل</a>
+        <a href="{% url 'scores:export' classroom.pk %}?mode=members" class="px-4 py-2 rounded-full border bg-white text-sm font-bold">لیست اعضا</a>
+        {% if user == classroom.teacher %}<a href="{% url 'classes:edit' classroom.pk %}" class="px-4 py-2 rounded-full border bg-white text-sm font-bold">✏️ ویرایش</a><a href="{% url 'classes:delete' classroom.pk %}" class="px-4 py-2 rounded-full border bg-white text-sm text-daneh-600">حذف</a>{% else %}<form method="post" action="{% url 'classes:leave' classroom.pk %}">{% csrf_token %}<button onclick="return confirm('از کلاس خارج می‌شوید؟')" class="px-4 py-2 rounded-full border bg-white text-sm">خروج از کلاس</button></form>{% endif %}
+      </div>
+    </div>
+    {% if classroom.description %}<div class="px-6 py-3 text-sm text-zinc-600 bg-white border-t">{{ classroom.description }}</div>{% endif %}
+  </div>
+
+  <!-- Tabs -->
+  <div class="mt-6 flex gap-2 overflow-auto pb-2 scrollbar-thin">
+    <button onclick="switchTab('students')" id="tab-students" class="tab-btn px-5 py-2.5 rounded-full font-black text-sm whitespace-nowrap bg-daneh-600 text-white shadow-soft">👥 دانش‌آموزان</button>
+    <button onclick="switchTab('groups')" id="tab-groups" class="tab-btn px-5 py-2.5 rounded-full bg-white border text-sm whitespace-nowrap font-bold">👨‍👩‍👧‍👦 گروه‌ها</button>
+    <button onclick="switchTab('lessons')" id="tab-lessons" class="tab-btn px-5 py-2.5 rounded-full bg-white border text-sm whitespace-nowrap font-bold">📖 درس‌ها</button>
+    <button onclick="switchTab('exams')" id="tab-exams" class="tab-btn px-5 py-2.5 rounded-full bg-white border text-sm whitespace-nowrap font-bold">📝 آزمون‌ها</button>
+    <button onclick="switchTab('report')" id="tab-report" class="tab-btn px-5 py-2.5 rounded-full bg-white border text-sm whitespace-nowrap font-bold">📊 کارنامه</button>
+  </div>
+
+  <!-- Students -->
+  <div id="pane-students" class="tab-pane mt-4">
+    <div class="bg-white rounded-2xl shadow-soft border overflow-hidden">
+      <div class="p-4 flex flex-wrap justify-between items-center gap-3 border-b bg-zinc-50/50"><h3 class="font-black">دانش‌آموزان ({{ classroom.students_count|fa_digits }})</h3><input id="studentSearch" placeholder="جستجوی نام یا نام کاربری..." class="rounded-full border px-4 py-2 text-sm w-64 focus:ring-2 focus:ring-daneh-500 outline-none"></div>
+      <div class="overflow-auto"><table class="w-full text-sm"><thead class="bg-zinc-50"><tr><th class="p-3 text-right">ردیف</th><th class="p-3 text-right">نام</th><th class="p-3 text-right">نام کاربری</th><th class="p-3 text-right">شماره</th><th class="p-3 text-center">کارنامه</th></tr></thead><tbody id="studentTable">
+        {% for s in students %}
+        <tr class="border-t hover:bg-cream-50 student-row transition"><td class="p-3 font-mono">{{ forloop.counter|fa_digits }}</td><td class="p-3 font-bold">{{ s.get_full_name|default:s.username }}</td><td class="p-3 font-mono text-zinc-600">{{ s.username }}</td><td class="p-3">{{ s.phone|default:"—" }}</td><td class="p-3 text-center"><a href="{% url 'scores:report' classroom.pk %}?student={{ s.pk }}" class="text-daneh-600 text-xs border px-3 py-1 rounded-full font-bold hover:bg-daneh-50">کارنامه</a></td></tr>
+        {% empty %}<tr><td colspan="5" class="p-10 text-center"><div class="text-3xl">👋</div><div class="text-zinc-400 mt-2">هنوز دانش‌آموزی عضو نشده. کد دعوت را به اشتراک بگذارید.</div></td></tr>{% endfor %}
+      </tbody></table></div>
+    </div>
+  </div>
+
+  <!-- Groups -->
+  <div id="pane-groups" class="tab-pane hidden mt-4">
+    <div class="flex justify-between items-center"><h3 class="font-black">گروه‌ها ({{ groups|length|fa_digits }})</h3>{% if user == classroom.teacher %}<a href="{% url 'groups:create' classroom.pk %}" class="px-5 py-2.5 rounded-full bg-daneh-600 text-white text-sm font-black">+ گروه جدید</a>{% endif %}</div>
+    <div class="mt-4 grid md:grid-cols-2 gap-4">
+      {% for group in groups %}
+        {% include 'groups/_group_card.html' %}
+      {% empty %}<div class="col-span-2 bg-white rounded-2xl p-10 text-center text-zinc-400 border-2 border-dashed"><div class="text-3xl">👨‍👩‍👧‍👦</div><div class="mt-2">هنوز گروهی ایجاد نشده</div>{% if user == classroom.teacher %}<a href="{% url 'groups:create' classroom.pk %}" class="text-daneh-600 font-black">ایجاد گروه</a>{% endif %}</div>{% endfor %}
+    </div>
+  </div>
+
+  <!-- Lessons -->
+  <div id="pane-lessons" class="tab-pane hidden mt-4">
+    <div class="flex justify-between items-center"><h3 class="font-black">درس‌ها</h3>{% if user == classroom.teacher %}<a href="{% url 'lessons:create' classroom.pk %}" class="px-5 py-2.5 rounded-full bg-daneh-600 text-white text-sm font-black">+ درس جدید</a>{% endif %}</div>
+    <div class="mt-4 space-y-3">
+      {% for lesson in lessons %}
+      <div class="bg-white rounded-2xl p-5 shadow-soft border flex justify-between items-start hover:shadow-softLg transition">
+        <div class="flex gap-4"><span class="w-10 h-10 rounded-xl bg-cream-100 grid place-items-center shrink-0">📖</span><div><div class="font-black">{{ lesson.title }}</div><div class="text-sm text-zinc-500 mt-1 line-clamp-2">{{ lesson.description|truncatewords:20|default:"بدون توضیح" }}</div><div class="text-xs text-zinc-400 mt-2 flex gap-2"><span>{% if lesson.date %}{{ lesson.date }}{% endif %}</span><span>• ترتیب: {{ lesson.order|fa_digits }}</span></div>{% if lesson.attachment %}<a href="{{ lesson.attachment.url }}" class="text-xs text-daneh-600 border px-2.5 py-1 rounded-full mt-2 inline-block font-bold">📎 دانلود فایل</a>{% endif %}</div></div>
+        {% if user == classroom.teacher %}<div class="flex gap-1 shrink-0"><a href="{% url 'lessons:edit' lesson.pk %}" class="w-8 h-8 grid place-items-center rounded-xl border hover:bg-zinc-50">✏️</a><a href="{% url 'lessons:detail' lesson.pk %}" class="w-8 h-8 grid place-items-center rounded-xl border hover:bg-zinc-50">👁️</a><a href="{% url 'lessons:delete' lesson.pk %}" class="w-8 h-8 grid place-items-center rounded-xl border hover:bg-daneh-50 text-daneh-600">🗑️</a></div>{% else %}<a href="{% url 'lessons:detail' lesson.pk %}" class="text-xs px-3 py-1 rounded-full border">مشاهده</a>{% endif %}
+      </div>
+      {% empty %}<div class="bg-white rounded-2xl p-10 text-center text-zinc-400 border-2 border-dashed">درسی ثبت نشده</div>{% endfor %}
+    </div>
+  </div>
+
+  <!-- Exams -->
+  <div id="pane-exams" class="tab-pane hidden mt-4">
+    <div class="flex justify-between items-center"><h3 class="font-black">آزمون‌ها</h3>{% if user == classroom.teacher %}<a href="{% url 'exams:create' classroom.pk %}" class="px-5 py-2.5 rounded-full bg-daneh-600 text-white text-sm font-black">+ آزمون جدید</a>{% endif %}</div>
+    <div class="mt-4 grid md:grid-cols-2 gap-4">
+      {% for exam in exams %}
+      <div class="bg-white rounded-2xl p-5 shadow-soft border hover:shadow-softLg transition">
+        <div class="flex justify-between items-start"><span class="text-xs px-2.5 py-1 rounded-full bg-daneh-100 text-daneh-700 font-black">{{ exam.get_exam_type_display }}</span><span class="text-xs text-zinc-400">{{ exam.date|default:"بدون تاریخ" }}</span></div>
+        <div class="font-black mt-2">{{ exam.title }}</div><div class="text-xs text-zinc-500 mt-1 line-clamp-2">{{ exam.description|truncatewords:15|default:"بدون توضیح" }}</div>
+        <div class="text-xs text-zinc-400 mt-2">از {{ exam.total_score|fa_digits }} نمره {% if exam.lesson %}• {{ exam.lesson.title }}{% endif %}</div>
+        <div class="mt-4 flex gap-2 flex-wrap">
+          <a href="{% url 'exams:detail' exam.pk %}" class="text-xs px-3.5 py-1.5 rounded-full border font-bold hover:bg-zinc-50">جزئیات</a>
+          {% if user == classroom.teacher %}
+            <a href="{% url 'scores:bulk' exam.pk %}" class="text-xs px-3.5 py-1.5 rounded-full bg-barg-500 text-white font-bold hover:bg-green-700">📝 ثبت نمرات</a>
+            <a href="{% url 'scores:export' classroom.pk %}?mode=exam&exam={{ exam.pk }}" class="text-xs px-3.5 py-1.5 rounded-full border font-bold">اکسل</a>
+            <a href="{% url 'exams:edit' exam.pk %}" class="text-xs p-1.5 rounded-full border w-7 h-7 grid place-items-center">✏️</a>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}<div class="col-span-2 bg-white rounded-2xl p-10 text-center text-zinc-400 border-2 border-dashed"><div class="text-3xl">📝</div><div class="mt-2">آزمونی ثبت نشده</div></div>{% endfor %}
+    </div>
+  </div>
+
+  <!-- Report -->
+  <div id="pane-report" class="tab-pane hidden mt-4">
+    <div class="bg-white rounded-2xl shadow-soft border overflow-hidden">
+      <div class="p-4 flex flex-wrap justify-between items-center gap-3"><h3 class="font-black">کارنامه کلاس — رتبه‌بندی</h3><div class="flex gap-2"><a href="{% url 'scores:report' classroom.pk %}" class="text-sm text-daneh-600 font-bold">کارنامه من →</a><a href="{% url 'scores:export' classroom.pk %}" class="text-sm px-3 py-1 rounded-full border font-bold">📥 اکسل</a></div></div>
+      <div class="overflow-auto"><table class="w-full text-sm"><thead class="bg-zinc-50"><tr><th class="p-3 text-right">رتبه</th><th class="p-3 text-right">دانش‌آموز</th><th class="p-3 text-center">میانگین</th><th class="p-3 text-center">نمودار</th><th class="p-3 text-center">وضعیت</th></tr></thead><tbody>
+        {% for r in report %}
+        <tr class="border-t hover:bg-cream-50 transition"><td class="p-3 font-black">{% if r.rank == 1 %}🥇{% elif r.rank == 2 %}🥈{% elif r.rank == 3 %}🥉{% else %}{{ r.rank|fa_digits }}{% endif %}</td><td class="p-3 font-bold">{{ r.student.get_full_name|default:r.student.username }}</td><td class="p-3 text-center">{% if r.avg %}<span class="px-3 py-1 rounded-full text-white text-xs font-black" style="background: {{ r.avg|avg_color }}">{{ r.avg|fa_digits }}</span>{% else %}—{% endif %}</td><td class="p-3"><div class="w-24 h-2.5 bg-zinc-100 rounded-full mx-auto overflow-hidden"><div class="h-2.5 rounded-full transition-all" style="width: {% if r.avg %}{% widthratio r.avg 20 100 %}%{% else %}0%{% endif %}; background: {{ r.avg|avg_color }}"></div></div></td><td class="p-3 text-center text-xs">{% if r.avg %}{% if r.avg >= 17 %}ممتاز{% elif r.avg >= 12 %}قابل قبول{% else %}نیاز به تلاش{% endif %}{% else %}—{% endif %}</td></tr>
+        {% empty %}<tr><td colspan="5" class="p-10 text-center text-zinc-400">داده‌ای برای کارنامه نیست — ابتدا آزمون و نمره ثبت کنید</td></tr>{% endfor %}
+      </tbody></table></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(name){
+  document.querySelectorAll('.tab-pane').forEach(el=>el.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(el=>{el.className='tab-btn px-5 py-2.5 rounded-full bg-white border text-sm whitespace-nowrap font-bold hover:bg-zinc-50'});
+  document.getElementById('pane-'+name).classList.remove('hidden');
+  const act=document.getElementById('tab-'+name);
+  act.className='tab-btn px-5 py-2.5 rounded-full font-black text-sm whitespace-nowrap bg-daneh-600 text-white shadow-soft';
+  history.replaceState(null,'','?tab='+name);
+}
+(function(){
+  const p=new URLSearchParams(location.search).get('tab');
+  if(p && ['students','groups','lessons','exams','report'].includes(p)) switchTab(p);
+})();
+function copyInvite(code){
+  navigator.clipboard.writeText(code);
+  const btn=event.target.closest('button');
+  const old=btn.innerHTML; btn.innerHTML='✓ کپی شد'; btn.classList.add('bg-barg-500');
+  setTimeout(()=>{btn.innerHTML=old; btn.classList.remove('bg-barg-500')},1500);
+}
+document.getElementById('studentSearch')?.addEventListener('input', e=>{
+  const q=e.target.value.toLowerCase();
+  document.querySelectorAll('.student-row').forEach(row=> row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none');
+});
+function loadingBtn(el){ el.innerHTML='<span class="pom-spinner inline-block w-4 h-4 align-middle"></span> در حال تولید...'; return true; }
+</script>
+{% endblock %}

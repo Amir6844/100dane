@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}{% if object %}ویرایش آزمون{% else %}آزمون جدید{% endif %}{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  <div class="bg-white rounded-[2rem] p-8 shadow-soft border relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-daneh-600 to-amber-400"></div>
+    <div class="flex items-center gap-3">
+      <span class="w-12 h-12 rounded-2xl bg-daneh-100 grid place-items-center text-xl">📝</span>
+      <div>
+        <h1 class="text-xl font-black">{% if object %}ویرایش آزمون{% else %}آزمون جدید بسازید{% endif %}</h1>
+        <p class="text-xs text-zinc-500">{% if classroom %}کلاس: {{ classroom.name }}{% elif object %}کلاس: {{ object.classroom.name }}{% endif %} • مقیاس ۰–۲۰ • انتخاب نوع آزمون مهم است</p>
+      </div>
+    </div>
+    <form method="post" class="mt-6 space-y-5">{% csrf_token %}
+      {% for field in form %}
+        <div>
+          <label class="text-sm font-black text-zinc-700">{{ field.label }}</label>
+          <div class="mt-1.5">{{ field }}</div>
+          {% if field.help_text %}<div class="text-[11px] text-zinc-400 mt-1">{{ field.help_text }}</div>{% endif %}
+          {% if field.errors %}<div class="text-xs text-daneh-600 bg-daneh-50 border border-daneh-100 rounded-xl px-3 py-2 mt-1.5">{{ field.errors.0 }}</div>{% endif %}
+        </div>
+      {% endfor %}
+      {% if form.non_field_errors %}<div class="text-sm text-daneh-600 bg-daneh-50 p-3 rounded-xl">{{ form.non_field_errors.0 }}</div>{% endif %}
+      <div class="flex gap-3 pt-2">
+        <button class="flex-1 py-3 rounded-full bg-daneh-600 text-white font-black hover:bg-daneh-700 shadow-soft">ذخیره آزمون</button>
+        <a href="{% if classroom %}{% url 'classes:detail' classroom.pk %}?tab=exams{% elif object %}{% url 'classes:detail' object.classroom.pk %}?tab=exams{% else %}{% url 'classes:list' %}{% endif %}" class="px-6 py-3 rounded-full border bg-white font-bold hover:bg-zinc-50">بازگشت</a>
+      </div>
+    </form>
+    <div class="mt-4 p-3 rounded-2xl bg-cream-50 border text-xs text-zinc-600 leading-4">💡 <b>حداکثر نمره</b> معمولاً ۲۰ است. برای هر آزمون می‌توانید گروه خاصی انتخاب کنید (اختیاری).</div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+<div class="flex flex-wrap justify-between gap-4 items-start">
+  <div>
+    <h1 class="text-[28px] font-black tracking-tight">{{ title }}</h1>
+    {% if subtitle %}<p class="text-sm text-zinc-500 mt-1">{{ subtitle }}</p>{% endif %}
+  </div>
+  <div class="flex gap-2 flex-wrap">
+    {{ actions }}
+  </div>
+</div>
+{% if divider %}<div class="leaf-divider mt-4 opacity-20"></div>{% endif %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load persian %}
+{% block title %}نمرات من — ۱۰۰دانه{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto">
+  <div class="flex flex-wrap justify-between gap-4 items-center">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-2"><span class="w-10 h-10 rounded-2xl bg-barg-100 grid place-items-center">📊</span> نمرات من</h1>
+      <p class="text-sm text-zinc-500 mt-1">کارنامه شخصی — همه کلاس‌ها</p>
+    </div>
+    <a href="{% url 'accounts:dashboard' %}" class="px-4 py-2 rounded-full border bg-white text-sm font-bold">← داشبورد</a>
+  </div>
+  <div class="mt-6 bg-white rounded-2xl shadow-soft border overflow-hidden">
+    <div class="p-4 border-b bg-zinc-50/50 flex justify-between items-center"><h3 class="font-black">جدول نمرات</h3><span class="text-xs bg-cream-100 px-2 py-1 rounded-full">{{ scores|length|fa_digits }} مورد</span></div>
+    <div class="overflow-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-zinc-50"><tr><th class="p-3 text-right">کلاس</th><th class="p-3 text-right">آزمون</th><th class="p-3 text-center">نمره</th><th class="p-3 text-center">حداکثر</th><th class="p-3 text-right">تاریخ</th></tr></thead>
+        <tbody>
+          {% for s in scores %}
+          <tr class="border-t hover:bg-cream-50 transition">
+            <td class="p-3 font-bold">{{ s.exam.classroom.name }}</td>
+            <td class="p-3">{{ s.exam.title }} <span class="text-xs text-zinc-400">({{ s.exam.get_exam_type_display }})</span></td>
+            <td class="p-3 text-center"><span class="px-3 py-1 rounded-full text-white text-xs font-black" style="background: {{ s.value|avg_color }}">{{ s.value|fa_digits }}</span></td>
+            <td class="p-3 text-center text-zinc-500">{{ s.exam.total_score|fa_digits }}</td>
+            <td class="p-3 text-xs text-zinc-500">{{ s.created_at|date:"Y/m/d" }}</td>
+          </tr>
+          {% empty %}<tr><td colspan="5" class="p-12 text-center"><div class="w-16 h-16 mx-auto rounded-2xl bg-cream-100 grid place-items-center text-2xl">📝</div><div class="font-black mt-3">هنوز نمره‌ای ندارید</div><p class="text-sm text-zinc-500 mt-1">پس از ثبت توسط دبیر، اینجا نمایش داده می‌شود.</p></td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

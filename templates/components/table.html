@@ -1,0 +1,9 @@
+<div class="bg-white rounded-2xl shadow-soft border overflow-hidden">
+  {% if title %}<div class="p-4 border-b bg-zinc-50/50 flex justify-between items-center"><h3 class="font-black">{{ title }}</h3>{{ extra }}</div>{% endif %}
+  <div class="overflow-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-zinc-50"><tr>{% for col in columns %}<th class="p-3 text-right font-black text-zinc-600">{{ col }}</th>{% endfor %}</tr></thead>
+      <tbody>{{ rows }}</tbody>
+    </table>
+  </div>
+</div>

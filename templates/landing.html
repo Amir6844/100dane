@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Hero -->
+<section class="relative overflow-hidden">
+  <div class="seed-pattern absolute inset-0 pointer-events-none"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20 grid lg:grid-cols-2 gap-10 items-center relative">
+    <div>
+      <span class="inline-flex items-center gap-2 bg-daneh-100 text-daneh-700 text-xs px-3 py-1.5 rounded-full font-bold">🍃 سال تحصیلی ۱۴۰۵-۱۴۰۶ • مقیاس ۰–۲۰ ایرانی</span>
+      <h1 class="mt-4 text-[34px] lg:text-[48px] font-black leading-[1.15]">هر کلاس،<br><span class="text-daneh-600 relative">یک انار<span class="absolute -bottom-1 right-0 w-full h-2 bg-daneh-100 -z-10 rounded-full"></span></span> پر از<br>دانه‌های دانایی</h1>
+      <p class="mt-5 text-zinc-600 leading-7 text-[15px]">۱۰۰دانه، پلتفرم ایرانی مدیریت کلاس برای دبیران و دانش‌آموزان. کلاس بسازید، گروه‌بندی کنید، درس و آزمون تعریف کنید، نمرات را در لحظه ثبت کنید و کارنامه اکسل بگیرید — همه با حال و هوای انار ایرانی.</p>
+      <div class="mt-7 flex flex-wrap gap-3">
+        <a href="{% url 'accounts:register' %}" class="px-7 py-3.5 rounded-full bg-daneh-600 text-white font-black hover:bg-daneh-700 shadow-soft hover:shadow-softLg hover:-translate-y-0.5 transition flex items-center gap-2">شروع رایگان — کلاس بسازید <span>→</span></a>
+        <a href="{% url 'accounts:login' %}" class="px-7 py-3.5 rounded-full border border-zinc-200 bg-white hover:bg-zinc-50 font-bold transition">ورود به حساب</a>
+      </div>
+      <div class="mt-8 flex gap-6 text-sm divide-x divide-x-reverse divide-zinc-200">
+        <div class="pl-6"><div class="font-black text-xl">۱۰۰+</div><div class="text-zinc-500 text-xs">دانه دانش</div></div>
+        <div class="px-6"><div class="font-black text-xl">۰–۲۰</div><div class="text-zinc-500 text-xs">مقیاس ایرانی</div></div>
+        <div class="pr-6"><div class="font-black text-xl">اکسل</div><div class="text-zinc-500 text-xs">خروجی آنی</div></div>
+      </div>
+      <div class="mt-6 flex items-center gap-2 text-xs text-zinc-500">
+        <span class="w-2 h-2 bg-barg-500 rounded-full animate-pulse"></span> هم‌اکنون ۱۲۰+ دبیر فعال
+      </div>
+    </div>
+    <div class="relative">
+      <div class="bg-white rounded-[2rem] p-6 lg:p-8 shadow-softLg border border-zinc-100 relative overflow-hidden">
+        <div class="absolute -top-10 -left-10 w-40 h-40 bg-daneh-100 rounded-full blur-2xl opacity-60"></div>
+        <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-barg-100 rounded-full blur-2xl opacity-50"></div>
+        <svg viewBox="0 0 340 220" class="w-full h-auto relative">
+          <ellipse cx="170" cy="135" rx="90" ry="85" fill="#C22A4E" stroke="#851B37" stroke-width="3"/>
+          <path d="M135 55 L170 20 L205 55 L190 75 L150 75 Z" fill="#3E9B4F" stroke="#2a6b32" stroke-width="2"/>
+          <ellipse cx="170" cy="65" rx="18" ry="8" fill="#6fbf7a" opacity="0.6"/>
+          <g fill="#FFF3F6" opacity="0.95">
+            <circle cx="150" cy="120" r="12"/><circle cx="170" cy="115" r="13"/><circle cx="190" cy="120" r="12"/>
+            <circle cx="140" cy="145" r="11"/><circle cx="165" cy="145" r="14"/><circle cx="190" cy="145" r="11"/><circle cx="200" cy="170" r="10"/><circle cx="170" cy="175" r="12"/><circle cx="140" cy="170" r="10"/>
+            <circle cx="155" cy="195" r="9"/><circle cx="185" cy="195" r="9"/>
+          </g>
+          <g fill="#FEC2D0" opacity="0.9"><circle cx="170" cy="115" r="4"/><circle cx="165" cy="145" r="5"/></g>
+        </svg>
+        <div class="mt-6 grid grid-cols-3 gap-3 text-center">
+          <div class="bg-cream-50 rounded-2xl p-3.5 border border-cream-100"><div class="text-xl">👩‍🏫</div><div class="text-xs font-black mt-1">مدیریت کلاس</div><div class="text-[11px] text-zinc-500">با کد دعوت ۶ حرفی</div></div>
+          <div class="bg-daneh-50 rounded-2xl p-3.5 border border-daneh-100"><div class="text-xl">📝</div><div class="text-xs font-black mt-1">آزمون</div><div class="text-[11px] text-zinc-500">کوییز، میان‌ترم</div></div>
+          <div class="bg-barg-100 rounded-2xl p-3.5 border border-green-100"><div class="text-xl">📊</div><div class="text-xs font-black mt-1">کارنامه</div><div class="text-[11px] text-zinc-500">اکسل فارسی</div></div>
+        </div>
+      </div>
+      <!-- floating badge -->
+      <div class="absolute -bottom-4 -right-2 bg-white rounded-2xl shadow-soft border p-3 flex items-center gap-3 hidden lg:flex">
+        <span class="w-10 h-10 rounded-xl bg-barg-500 text-white grid place-items-center">✓</span>
+        <div><div class="font-black text-sm">نمره ثبت شد!</div><div class="text-xs text-zinc-500">علی رضایی — ۱۹.۵ از ۲۰</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="text-center"><span class="text-xs bg-cream-100 text-amber-800 px-3 py-1 rounded-full font-bold">چرا ۱۰۰دانه؟</span><h2 class="text-2xl font-black mt-3">همه‌چیز برای کلاس ایرانی</h2><p class="text-sm text-zinc-500 mt-2">طراحی شده با نیازهای مدارس ایران</p></div>
+  <div class="mt-8 grid md:grid-cols-3 gap-6">
+    <div class="bg-white rounded-2xl p-6 shadow-soft border hover:-translate-y-1 hover:shadow-softLg transition"><div class="w-11 h-11 rounded-xl bg-daneh-100 grid place-items-center text-xl">🏫</div><h3 class="font-black mt-4">کلاس با کد دعوت</h3><p class="text-sm text-zinc-600 mt-2 leading-6">هر کلاس کد ۶ حرفی یکتا دارد. دانش‌آموزان با کد وارد می‌شوند، بدون دردسر.</p></div>
+    <div class="bg-white rounded-2xl p-6 shadow-soft border hover:-translate-y-1 hover:shadow-softLg transition"><div class="w-11 h-11 rounded-xl bg-barg-100 grid place-items-center text-xl">👥</div><h3 class="font-black mt-4">گروه‌بندی هوشمند</h3><p class="text-sm text-zinc-600 mt-2 leading-6">گروه‌ها با رنگ و ظرفیت، جابه‌جایی آسان اعضا با یک کلیک.</p></div>
+    <div class="bg-white rounded-2xl p-6 shadow-soft border hover:-translate-y-1 hover:shadow-softLg transition"><div class="w-11 h-11 rounded-xl bg-cream-100 grid place-items-center text-xl">📊</div><h3 class="font-black mt-4">نمره و اکسل</h3><p class="text-sm text-zinc-600 mt-2 leading-6">ثبت گروهی نمره ۰–۲۰، میانگین، رتبه و خروجی .xlsx فارسی RTL.</p></div>
+  </div>
+  <div class="mt-10 bg-gradient-to-r from-daneh-600 to-daneh-700 rounded-[2rem] p-8 lg:p-10 text-white flex flex-col lg:flex-row justify-between items-center gap-6">
+    <div><h3 class="text-xl font-black">آماده‌اید انار دانش را بچینید؟</h3><p class="text-white/80 text-sm mt-1">کمتر از ۳۰ ثانیه تا اولین کلاس</p></div>
+    <a href="{% url 'accounts:register' %}" class="px-8 py-3.5 rounded-full bg-white text-daneh-700 font-black hover:bg-cream-50 transition">ایجاد حساب رایگان</a>
+  </div>
+</section>
+{% endblock %}

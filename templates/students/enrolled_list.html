@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load persian %}
+{% block title %}دانش‌آموزان — {{ classroom.name }}{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto">
+  <div class="flex flex-wrap justify-between gap-4 items-center">
+    <h1 class="text-2xl font-black flex items-center gap-2"><span class="w-10 h-10 rounded-2xl bg-daneh-100 grid place-items-center">👥</span> دانش‌آموزان {{ classroom.name }} <span class="text-sm bg-zinc-100 px-2 py-1 rounded-full">{{ students|length|fa_digits }} نفر</span></h1>
+    <a href="{% url 'classes:detail' classroom.pk %}?tab=students" class="px-4 py-2 rounded-full border bg-white text-sm font-bold">← بازگشت</a>
+  </div>
+  <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for s in students %}
+    <div class="bg-white rounded-2xl p-5 shadow-soft border hover:shadow-softLg transition">
+      <div class="flex items-center gap-3">
+        <span class="w-10 h-10 rounded-xl bg-cream-100 grid place-items-center font-black">{{ s.first_name|default:s.username|slice:":1" }}</span>
+        <div class="flex-1 min-w-0">
+          <div class="font-black truncate">{{ s.get_full_name|default:s.username }}</div>
+          <div class="text-xs text-zinc-500 truncate">{{ s.username }} • {{ s.student_code|default:"—" }}</div>
+        </div>
+      </div>
+      <div class="mt-4 flex gap-2">
+        <a href="{% url 'students:detail' classroom.pk s.pk %}" class="flex-1 py-2 rounded-full bg-daneh-50 text-daneh-700 text-center text-sm font-black hover:bg-daneh-100">پروفایل</a>
+        <a href="{% url 'scores:report' classroom.pk %}?student={{ s.pk }}" class="flex-1 py-2 rounded-full border text-center text-sm font-bold hover:bg-zinc-50">کارنامه</a>
+      </div>
+    </div>
+    {% empty %}<div class="col-span-3 bg-white rounded-2xl p-12 text-center border-2 border-dashed"><div class="text-3xl">👥</div><div class="mt-2 text-zinc-400">هنوز دانش‌آموزی عضو نشده</div></div>{% endfor %}
+  </div>
+</div>
+{% endblock %}

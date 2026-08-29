@@ -1,0 +1,14 @@
+{# Usage: include with variant=primary|secondary|outline|danger|success, label, icon, href or type submit #}
+{% with variant=variant|default:"primary" %}
+{% if href %}
+<a href="{{ href }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black transition focus-ring
+{% if variant == 'primary' %}bg-daneh-600 text-white hover:bg-daneh-700 shadow-soft{% elif variant == 'secondary' %}bg-zinc-900 text-white hover:bg-black{% elif variant == 'outline' %}bg-white border border-zinc-200 hover:bg-zinc-50{% elif variant == 'danger' %}bg-white border border-daneh-200 text-daneh-600 hover:bg-daneh-50{% elif variant == 'success' %}bg-barg-500 text-white hover:bg-barg-600{% endif %}">
+  {% if icon %}<span>{{ icon }}</span>{% endif %}{{ label }}
+</a>
+{% else %}
+<button type="{{ type|default:'button' }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black transition focus-ring
+{% if variant == 'primary' %}bg-daneh-600 text-white hover:bg-daneh-700 shadow-soft{% elif variant == 'secondary' %}bg-zinc-900 text-white hover:bg-black{% elif variant == 'outline' %}bg-white border border-zinc-200 hover:bg-zinc-50{% elif variant == 'danger' %}bg-white border border-daneh-200 text-daneh-600 hover:bg-daneh-50{% elif variant == 'success' %}bg-barg-500 text-white hover:bg-barg-600{% endif %}">
+  {% if icon %}<span>{{ icon }}</span>{% endif %}{{ label }}
+</button>
+{% endif %}
+{% endwith %}

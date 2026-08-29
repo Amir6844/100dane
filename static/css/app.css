@@ -1,0 +1,7 @@
+/* 100dane extra — Tailwind handles most */
+@media print{
+  nav,footer,.print\:hidden,#toastWrap{ display:none !important; }
+  body{ background:white !important; }
+  .shadow-soft,.shadow-softLg{ box-shadow:none !important; }
+}
+.focus-ring:focus{ outline:none; box-shadow:0 0 0 3px rgba(194,42,78,.2); border-color:#C22A4E; }

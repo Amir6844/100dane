@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}حذف درس{% endblock %}
+{% block content %}
+<div class="max-w-lg mx-auto mt-8">
+  <div class="bg-white rounded-[2rem] p-8 shadow-softLg border text-center relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-full h-1 bg-amber-400"></div>
+    <div class="w-16 h-16 mx-auto rounded-2xl bg-cream-100 grid place-items-center text-2xl">📚</div>
+    <h1 class="text-xl font-black mt-4">حذف درس «{{ object.title }}»؟</h1>
+    <p class="text-sm text-zinc-500 mt-2">آیا مطمئن هستید؟ این عملیات اطلاعات مرتبط را تحت تأثیر قرار می‌دهد.</p>
+    <form method="post" class="mt-6 flex gap-3 justify-center">{% csrf_token %}
+      <button class="px-8 py-3 rounded-full bg-daneh-600 text-white font-black">حذف</button>
+      <a href="{% url 'classes:detail' object.classroom.pk %}?tab=lessons" class="px-8 py-3 rounded-full border bg-white font-bold">انصراف</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

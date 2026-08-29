@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}{% if object %}ویرایش گروه{% else %}گروه جدید{% endif %} — {% if classroom %}{{ classroom.name }}{% elif object %}{{ object.classroom.name }}{% endif %}{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  {% include 'partials/breadcrumb.html' with breadcrumb=breadcrumb %}
+  <div class="mt-4 bg-white rounded-[2rem] p-8 shadow-soft border relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-daneh-600 to-barg-500"></div>
+    <div class="flex items-center gap-3">
+      <span class="w-12 h-12 rounded-2xl grid place-items-center text-xl" style="background: {% if object and object.color %}{{ object.color }}{% else %}#3E9B4F{% endif %}20">👨‍👩‍👧‍👦</span>
+      <div>
+        <h1 class="text-xl font-black">{% if object %}ویرایش گروه «{{ object.name }}»{% else %}گروه جدید بسازید{% endif %}</h1>
+        <p class="text-xs text-zinc-500">کلاس: {% if classroom %}{{ classroom.name }} • {{ classroom.get_grade_level_display }}{% elif object %}{{ object.classroom.name }}{% endif %}</p>
+      </div>
+    </div>
+    <form method="post" class="mt-6 space-y-5">{% csrf_token %}
+      {% for field in form %}
+        <div>
+          <label class="text-sm font-black text-zinc-700">{{ field.label }}</label>
+          <div class="mt-1.5">{{ field }}</div>
+          {% if field.help_text %}<div class="text-[11px] text-zinc-400 mt-1">{{ field.help_text }}</div>{% endif %}
+          {% if field.errors %}<div class="text-xs text-daneh-600 bg-daneh-50 border border-daneh-100 rounded-xl px-3 py-2 mt-1.5">{{ field.errors.0 }}</div>{% endif %}
+        </div>
+      {% endfor %}
+      <div class="flex gap-3 pt-2">
+        <button class="flex-1 py-3 rounded-full bg-daneh-600 text-white font-black hover:bg-daneh-700 shadow-soft transition">ذخیره گروه</button>
+        {% if classroom %}<a href="{% url 'classes:detail' classroom.pk %}?tab=groups" class="px-6 py-3 rounded-full border bg-white font-bold hover:bg-zinc-50">انصراف</a>{% elif object %}<a href="{% url 'classes:detail' object.classroom.pk %}?tab=groups" class="px-6 py-3 rounded-full border bg-white font-bold hover:bg-zinc-50">انصراف</a>{% endif %}
+      </div>
+    </form>
+    <div class="leaf-divider mt-6 opacity-20"></div>
+    <div class="text-[11px] text-zinc-400 text-center mt-3">هر گروه مثل یک خوشه دانه — متعادل و هماهنگ 🍃</div>
+  </div>
+</div>
+{% endblock %}

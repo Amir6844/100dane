@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load persian %}
+{% block title %}آزمون‌ها — {{ classroom.name }}{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto">
+  <div class="flex flex-wrap justify-between gap-4 items-center">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-2"><span class="w-10 h-10 rounded-2xl bg-daneh-100 grid place-items-center">📝</span> آزمون‌های {{ classroom.name }}</h1>
+      <p class="text-sm text-zinc-500 mt-1">مدیریت آزمون‌ها — هر آزمون یک سنجش دانه‌ها</p>
+    </div>
+    <div class="flex gap-2">
+      <a href="{% url 'classes:detail' classroom.pk %}?tab=exams" class="px-4 py-2 rounded-full border bg-white text-sm font-bold hover:bg-zinc-50">← بازگشت</a>
+      {% if user.is_teacher and user == classroom.teacher %}<a href="{% url 'exams:create' classroom.pk %}" class="px-6 py-2.5 rounded-full bg-daneh-600 text-white text-sm font-black hover:bg-daneh-700 shadow-soft">+ آزمون جدید</a>{% endif %}
+    </div>
+  </div>
+  <div class="mt-6 grid md:grid-cols-2 gap-4">
+    {% for e in exams %}
+    <div class="bg-white rounded-2xl p-5 shadow-soft border hover:shadow-softLg transition relative overflow-hidden group">
+      <div class="absolute top-0 right-0 w-full h-1" style="background: {% if e.exam_type == 'quiz' %}#E8B54A{% elif e.exam_type == 'midterm' %}#C22A4E{% elif e.exam_type == 'final' %}#3E9B4F{% else %}#E5E7EB{% endif %}"></div>
+      <div class="flex justify-between items-start">
+        <span class="text-xs px-2.5 py-1 rounded-full bg-daneh-100 text-daneh-700 font-black">{{ e.get_exam_type_display }}</span>
+        <span class="text-xs text-zinc-400">{% if e.date %}{{ e.date }}{% elif e.exam_date %}{{ e.exam_date }}{% else %}بدون تاریخ{% endif %}</span>
+      </div>
+      <div class="font-black mt-2 group-hover:text-daneh-600 transition">{{ e.title }}</div>
+      <div class="text-sm text-zinc-500 mt-1 line-clamp-2 leading-5">{{ e.description|truncatewords:16|default:"بدون توضیح" }}</div>
+      <div class="text-xs text-zinc-400 mt-2">از {{ e.total_score|fa_digits }} نمره {% if e.lesson %}• {{ e.lesson.title }}{% endif %} {% if e.group %}• گروه {{ e.group.name }}{% endif %}</div>
+      <div class="mt-4 flex gap-2 flex-wrap">
+        <a href="{% url 'exams:detail' e.pk %}" class="text-xs px-3.5 py-1.5 rounded-full border font-bold hover:bg-zinc-50">جزئیات</a>
+        {% if user.is_teacher %}
+          <a href="{% url 'scores:bulk' e.pk %}" class="text-xs px-3.5 py-1.5 rounded-full bg-barg-500 text-white font-bold hover:bg-green-700">📝 ثبت نمرات</a>
+          <a href="{% url 'scores:export' e.classroom.pk %}?mode=exam&exam={{ e.pk }}" class="text-xs px-3.5 py-1.5 rounded-full border font-bold hover:bg-cream-50">📥 اکسل</a>
+        {% endif %}
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-span-2 bg-white rounded-2xl p-12 text-center border-2 border-dashed">
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-daneh-100 grid place-items-center text-2xl">📝</div>
+      <h3 class="font-black mt-4">آزمونی ثبت نشده</h3>
+      <p class="text-sm text-zinc-500 mt-1">اولین آزمون کلاس را ایجاد کنید.</p>
+      {% if user.is_teacher %}<a href="{% url 'exams:create' classroom.pk %}" class="inline-flex mt-4 px-6 py-2.5 rounded-full bg-daneh-600 text-white font-black">ایجاد آزمون</a>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

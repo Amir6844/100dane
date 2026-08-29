@@ -1,0 +1,9 @@
+{% if breadcrumb %}
+<nav class="flex items-center gap-2 text-xs text-zinc-500 flex-wrap" aria-label="breadcrumb">
+  <a href="{% url 'accounts:dashboard' %}" class="hover:text-daneh-600 flex items-center gap-1"><span>🏠</span> خانه</a>
+  {% for item in breadcrumb %}
+    <span class="text-zinc-300">›</span>
+    {% if item.url %}<a href="{{ item.url }}" class="hover:text-daneh-600">{{ item.label }}</a>{% else %}<span class="font-bold text-zinc-900">{{ item.label }}</span>{% endif %}
+  {% endfor %}
+</nav>
+{% endif %}

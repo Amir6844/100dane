@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}{% if object %}ویرایش کلاس{% else %}ایجاد کلاس{% endif %} — ۱۰۰دانه{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto">
+  <div class="mb-4 flex items-center gap-2 text-xs text-zinc-500">
+    <a href="{% url 'classes:list' %}" class="hover:text-daneh-600">کلاس‌ها</a><span>›</span><span class="font-bold text-zinc-900">{% if object %}ویرایش{% else %}ایجاد{% endif %}</span>
+  </div>
+  <div class="bg-white rounded-[2rem] p-8 shadow-soft border relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-daneh-600 to-barg-500"></div>
+    <div class="flex gap-4">
+      <span class="w-12 h-12 rounded-2xl bg-daneh-100 grid place-items-center text-xl">🏫</span>
+      <div>
+        <h1 class="text-xl font-black">{% if object %}ویرایش کلاس «{{ object.name }}»{% else %}کلاس جدید بسازید{% endif %}</h1>
+        <p class="text-xs text-zinc-500 mt-1">اطلاعات کلاس را کامل کنید — هر فیلد مثل یک دانه، دقیق و مهم</p>
+      </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="mt-6 space-y-6">{% csrf_token %}
+      <div class="grid sm:grid-cols-2 gap-5">
+        {% for field in form %}
+          <div class="{% if field.name == 'description' or field.name == 'cover' %}sm:col-span-2{% endif %}">
+            <label class="text-sm font-black text-zinc-700">{{ field.label }}</label>
+            <div class="mt-1.5">{{ field }}</div>
+            {% if field.help_text %}<div class="text-[11px] text-zinc-400 mt-1">{{ field.help_text }}</div>{% endif %}
+            {% if field.errors %}<div class="text-xs text-daneh-600 bg-daneh-50 border border-daneh-100 rounded-xl px-3 py-2 mt-1.5">{{ field.errors.0 }}</div>{% endif %}
+          </div>
+        {% endfor %}
+      </div>
+      {% if form.non_field_errors %}<div class="text-sm text-daneh-600 bg-daneh-50 p-3 rounded-xl">{{ form.non_field_errors.0 }}</div>{% endif %}
+
+      <div class="flex gap-3 pt-2">
+        <button class="flex-1 py-3 rounded-full bg-daneh-600 text-white font-black hover:bg-daneh-700 shadow-soft transition">ذخیره کلاس</button>
+        <a href="{% url 'classes:list' %}" class="px-6 py-3 rounded-full border bg-white font-bold hover:bg-zinc-50">انصراف</a>
+      </div>
+      <div class="text-center text-[11px] text-zinc-400">با ذخیره، کد دعوت ۶ حرفی به طور خودکار ایجاد می‌شود</div>
+    </form>
+    <div class="leaf-divider mt-6 opacity-20"></div>
+  </div>
+
+  <!-- help card -->
+  <div class="mt-4 bg-cream-50 rounded-2xl p-4 border flex gap-3">
+    <span class="w-8 h-8 rounded-xl bg-white border grid place-items-center">💡</span>
+    <div class="text-xs leading-5 text-zinc-600"><b>راهنما:</b> نام کلاس را مثل «ریاضی دهم - الف» انتخاب کنید، سال تحصیلی را به صورت ۱۴۰۵-۱۴۰۶ وارد کنید، و رنگ برند کلاس را برای تمایز انتخاب کنید.</div>
+  </div>
+</div>
+{% endblock %}

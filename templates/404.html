@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}۴۰۴ — یافت نشد{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto py-16 text-center">
+  <div class="bg-white rounded-[2rem] p-10 shadow-soft border relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-full h-1 bg-daneh-600"></div>
+    <div class="w-20 h-20 mx-auto rounded-[1.5rem] bg-daneh-100 grid place-items-center text-3xl">🍎</div>
+    <h1 class="text-3xl font-black mt-4">۴۰۴ — دانه‌ای یافت نشد!</h1>
+    <p class="text-zinc-500 mt-2 leading-6">صفحه مورد نظر مثل دانه گمشده انار است.<br>شاید آدرس را اشتباه وارد کرده‌اید.</p>
+    <div class="mt-6 flex gap-3 justify-center">
+      <a href="/" class="px-6 py-3 rounded-full bg-daneh-600 text-white font-black hover:bg-daneh-700">بازگشت به خانه</a>
+      <a href="{% url 'classes:list' %}" class="px-6 py-3 rounded-full border bg-white font-bold hover:bg-zinc-50">کلاس‌ها</a>
+    </div>
+    <div class="leaf-divider mt-6 opacity-20"></div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load persian %}
+{% block title %}گزارش‌ها — ۱۰۰دانه{% endblock %}
+{% block content %}
+<div>
+  <div class="flex flex-wrap justify-between gap-4 items-start">
+    <div>
+      <h1 class="text-[28px] font-black flex items-center gap-3"><span class="w-10 h-10 rounded-2xl bg-amber-100 grid place-items-center">📊</span> گزارش‌ها</h1>
+      <p class="text-sm text-zinc-500 mt-1">گزارش‌های آموزشی کلاس‌های خود را مشاهده و دریافت کنید — خروجی Excel فارسی</p>
+    </div>
+    <span class="text-xs bg-cream-100 px-3 py-1 rounded-full font-bold">{{ total_classes|fa_digits }} کلاس فعال</span>
+  </div>
+
+  <div class="mt-6 grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-white rounded-2xl p-5 shadow-soft border relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-full h-1 bg-daneh-600"></div>
+      <div class="w-10 h-10 rounded-xl bg-daneh-100 grid place-items-center text-lg">🏫</div>
+      <h3 class="font-black mt-3">گزارش کلاس</h3>
+      <p class="text-xs text-zinc-500 mt-1 leading-4">کارنامه کامل هر کلاس: نمرات، میانگین، رتبه و نمودار عملکرد.</p>
+      <div class="mt-3 text-xs text-zinc-400">{{ total_classes|fa_digits }} کلاس • {{ total_students|fa_digits }} دانش‌آموز</div>
+      <a href="{% url 'classes:list' %}" class="mt-3 inline-flex w-full justify-center py-2 rounded-xl bg-daneh-600 text-white text-sm font-black">انتخاب کلاس →</a>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-soft border relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-full h-1 bg-barg-500"></div>
+      <div class="w-10 h-10 rounded-xl bg-barg-100 grid place-items-center text-lg">👨‍👩‍👧‍👦</div>
+      <h3 class="font-black mt-3">گزارش گروه</h3>
+      <p class="text-xs text-zinc-500 mt-1 leading-4">عملکرد هر گروه: اعضای گروه و میانگین گروهی.</p>
+      <div class="mt-3 text-xs text-zinc-400">{{ total_students|fa_digits }} دانش‌آموز در گروه‌ها</div>
+      <a href="{% url 'classes:list' %}" class="mt-3 inline-flex w-full justify-center py-2 rounded-xl border bg-white text-sm font-bold">مشاهده گروه‌ها</a>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-soft border relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-full h-1 bg-gold-400"></div>
+      <div class="w-10 h-10 rounded-xl bg-amber-100 grid place-items-center text-lg">📝</div>
+      <h3 class="font-black mt-3">گزارش آزمون</h3>
+      <p class="text-xs text-zinc-500 mt-1 leading-4">نتایج هر آزمون: شرکت‌کنندگان، میانگین، بیشترین/کمترین.</p>
+      <div class="mt-3 text-xs text-zinc-400">{{ total_exams|fa_digits }} آزمون ثبت شده</div>
+      <a href="{% url 'classes:list' %}" class="mt-3 inline-flex w-full justify-center py-2 rounded-xl border bg-white text-sm font-bold">انتخاب آزمون</a>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-soft border relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-full h-1 bg-zinc-800"></div>
+      <div class="w-10 h-10 rounded-xl bg-zinc-100 grid place-items-center text-lg">🎓</div>
+      <h3 class="font-black mt-3">گزارش دانش‌آموز</h3>
+      <p class="text-xs text-zinc-500 mt-1 leading-4">کارنامه فردی: همه نمرات، میانگین، رتبه کلاسی.</p>
+      <div class="mt-3 text-xs text-zinc-400">برای هر دانش‌آموز قابل دسترس</div>
+      <a href="{% url 'classes:list' %}" class="mt-3 inline-flex w-full justify-center py-2 rounded-xl border bg-white text-sm font-bold">انتخاب دانش‌آموز</a>
+    </div>
+  </div>
+
+  <div class="mt-8 grid lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 bg-white rounded-2xl shadow-soft border overflow-hidden">
+      <div class="p-4 border-b bg-zinc-50/50 flex justify-between items-center"><h3 class="font-black">کلاس‌های شما — دسترسی سریع به گزارش</h3><span class="text-xs text-zinc-500">روی هر کلاس بزنید</span></div>
+      <div class="divide-y">
+        {% for c in classrooms %}
+        <div class="p-4 flex flex-wrap justify-between gap-3 items-center hover:bg-cream-50 transition">
+          <div class="flex gap-3">
+            <span class="w-10 h-10 rounded-xl grid place-items-center text-white" style="background: {{ c.color }}">🍎</span>
+            <div>
+              <div class="font-black">{{ c.name }}</div>
+              <div class="text-xs text-zinc-500">{{ c.get_grade_level_display }} • {{ c.academic_year|default:"" }} • {{ c.students.count|fa_digits }} دانش‌آموز • {{ c.exams.count|fa_digits }} آزمون</div>
+            </div>
+          </div>
+          <div class="flex gap-2 flex-wrap">
+            <a href="{% url 'scores:report' c.pk %}" class="px-3 py-1.5 rounded-full border bg-white text-xs font-bold hover:bg-zinc-50">کارنامه</a>
+            <a href="{% url 'scores:export' c.pk %}" class="px-3 py-1.5 rounded-full bg-daneh-600 text-white text-xs font-black">📥 Excel کلاس</a>
+            <a href="{% url 'scores:export' c.pk %}?mode=detailed" class="px-3 py-1.5 rounded-full border bg-white text-xs font-bold">تفصیلی</a>
+          </div>
+        </div>
+        {% empty %}
+        <div class="p-12 text-center">
+          {% include 'components/empty_state.html' with icon="📊" title="هنوز کلاسی ندارید" message="برای گزارش‌گیری ابتدا کلاس بسازید." action_url="/classes/create/" action_label="ایجاد کلاس" %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <div class="bg-white rounded-2xl p-5 shadow-soft border">
+        <h3 class="font-black flex items-center gap-2"><span class="w-2 h-2 bg-daneh-600 rounded-full"></span> آخرین نمرات ثبت شده</h3>
+        <div class="mt-4 space-y-2">
+          {% for s in recent_scores %}
+          <div class="flex justify-between items-center p-3 rounded-xl border bg-zinc-50">
+            <div><div class="font-bold text-sm">{{ s.student.get_full_name|default:s.student.username }}</div><div class="text-xs text-zinc-500">{{ s.exam.title }} • {{ s.exam.classroom.name }}</div></div>
+            <span class="px-3 py-1 rounded-full text-white text-xs font-black" style="background: {{ s.value|avg_color }}">{{ s.value|fa_digits }}</span>
+          </div>
+          {% empty %}<div class="text-xs text-zinc-400 text-center py-4">هنوز نمره‌ای ثبت نشده</div>{% endfor %}
+        </div>
+      </div>
+
+      <div class="bg-gradient-to-br from-daneh-600 to-daneh-700 rounded-2xl p-5 text-white relative overflow-hidden">
+        <div class="seed-pattern absolute inset-0 opacity-20"></div>
+        <div class="relative">
+          <div class="font-black">↓ دریافت خروجی Excel</div>
+          <p class="text-xs text-white/80 mt-1 leading-4">هر گزارش با هدرهای فارسی: ردیف، نام، نام خانوادگی، کد، گروه، آزمون، نمره، حداکثر، درصد</p>
+          <div class="mt-3 flex gap-2">
+            <span class="text-[10px] bg-white/20 px-2 py-1 rounded-full">RTL</span><span class="text-[10px] bg-white/20 px-2 py-1 rounded-full">Vazirmatn</span><span class="text-[10px] bg-white/20 px-2 py-1 rounded-full">.xlsx</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

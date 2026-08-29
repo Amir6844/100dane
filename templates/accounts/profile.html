@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}پروفایل — ۱۰۰دانه{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto">
+  <div class="bg-white rounded-[2rem] p-8 shadow-soft border relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-daneh-600 to-barg-500"></div>
+    <div class="flex gap-4 items-center">
+      {% if user.avatar %}<img src="{{ user.avatar.url }}" class="w-16 h-16 rounded-2xl object-cover border">{% else %}<span class="w-16 h-16 rounded-2xl bg-daneh-600 text-white grid place-items-center text-xl font-black">{{ user.first_name|default:user.username|slice:":1" }}</span>{% endif %}
+      <div>
+        <h1 class="text-xl font-black">{{ user.get_full_name|default:user.username }}</h1>
+        <p class="text-sm text-zinc-500">{{ user.get_role_display }} • {{ user.username }}</p>
+      </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="mt-6 space-y-5">{% csrf_token %}
+      <div class="grid sm:grid-cols-2 gap-4">
+        {% for field in form %}
+          <div class="{% if field.name == 'bio' or field.name == 'avatar' %}sm:col-span-2{% endif %}">
+            <label class="text-sm font-black text-zinc-700">{{ field.label }}</label>
+            <div class="mt-1.5">{{ field }}</div>
+            {% if field.help_text %}<div class="text-[11px] text-zinc-400 mt-1">{{ field.help_text }}</div>{% endif %}
+            {% if field.errors %}<div class="text-xs text-daneh-600 bg-daneh-50 border border-daneh-100 rounded-xl px-3 py-2 mt-1.5">{{ field.errors.0 }}</div>{% endif %}
+          </div>
+        {% endfor %}
+      </div>
+      {% if form.non_field_errors %}<div class="text-sm text-daneh-600 bg-daneh-50 p-3 rounded-xl">{{ form.non_field_errors.0 }}</div>{% endif %}
+      <div class="flex gap-3 pt-2">
+        <button class="flex-1 py-3 rounded-full bg-daneh-600 text-white font-black hover:bg-daneh-700 shadow-soft">ذخیره تغییرات</button>
+        <a href="{% url 'accounts:dashboard' %}" class="px-6 py-3 rounded-full border bg-white font-bold hover:bg-zinc-50">بازگشت</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

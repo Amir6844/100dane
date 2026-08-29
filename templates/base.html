@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}۱۰۰دانه — انار دانش{% endblock %}</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={
+  darkMode:'class',
+  theme:{extend:{
+    colors:{
+      daneh:{50:'#FDF2F4',100:'#FBE0E5',200:'#F6C1CB',300:'#EE93A6',400:'#E35E7C',500:'#D63A5F',600:'#C22A4E',700:'#A01F3F',800:'#851B37',900:'#6F1A31'},
+      barg:{50:'#EDF7EF',100:'#E8F5EA',500:'#3E9B4F',600:'#2F7A3E'},
+      gold:{400:'#E8B54A',500:'#D9A23D'},
+      cream:{50:'#FFF9F2',100:'#FDF3E7',200:'#FBEAD1'},
+      ink:{900:'#2B1B1F',800:'#3A2228'}
+    },
+    fontFamily:{vazir:['Vazirmatn','sans-serif']},
+    boxShadow:{soft:'0 8px 30px rgba(198,42,78,0.10)',softLg:'0 16px 40px rgba(198,42,78,0.14)'}
+  }}
+}
+</script>
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+<script src="https://unpkg.com/htmx.org@1.9.12"></script>
+<style>
+*{font-family:Vazirmatn,sans-serif}
+.seed-pattern{background-image:radial-gradient(#C22A4E 1.4px, transparent 1.4px);background-size:22px 22px;opacity:.06}
+.leaf-divider{height:14px;background:repeating-linear-gradient(90deg, #3E9B4F 0 14px, transparent 14px 22px);mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 10'%3E%3Cpath d='M0 5 Q10 0 20 5 Q10 10 0 5Z' fill='black'/%3E%3C/svg%3E")}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:#E35E7C;border-radius:99px}
+.dark body{background:#1a0f13;color:#fdf2f4}
+.dark nav,.dark aside,.dark footer,.dark .bg-white{background:#2B1B1F !important;border-color:#3a1f27 !important;color:#fdf2f4}
+@keyframes seedPop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes seedBurst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--x),var(--y)) scale(0);opacity:0}}
+.pom-spinner{width:18px;height:18px;border:2.5px solid #FBE0E5;border-top-color:#C22A4E;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+{% block extra_css %}{% endblock %}
+</head>
+<body class="bg-cream-50 text-ink-900 min-h-screen flex flex-col antialiased">
+<div class="{% if user.is_authenticated %}flex min-h-screen{% endif %}">
+  {% if user.is_authenticated %}
+    {% include 'partials/sidebar.html' %}
+    <div id="sidebarOverlay" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-30 lg:hidden" onclick="closeSidebar()"></div>
+    <aside id="mobileSidebar" class="hidden fixed inset-y-0 right-0 w-[285px] bg-white z-40 flex-col border-l border-zinc-100 overflow-hidden lg:hidden">
+      <div class="p-4 flex justify-between items-center border-b">
+        <div class="flex items-center gap-2"><span class="w-8 h-8 rounded-xl bg-daneh-600 text-white grid place-items-center">🍎</span><span class="font-black">۱۰۰دانه</span></div>
+        <button onclick="closeSidebar()" class="w-8 h-8 grid place-items-center rounded-xl border hover:bg-zinc-50">×</button>
+      </div>
+      <nav class="flex-1 overflow-auto p-3 space-y-1">
+        <a href="{% url 'accounts:dashboard' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold {% if request.resolver_match.url_name == 'dashboard' %}bg-daneh-600 text-white{% else %}hover:bg-cream-50{% endif %}">📊 داشبورد</a>
+        <a href="{% url 'classes:list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-cream-50 font-bold">🏫 کلاس‌ها</a>
+        <a href="{% url 'scores:my_scores' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-cream-50 font-bold">📝 نمرات من</a>
+        <a href="{% url 'reports' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-cream-50 font-bold">📊 گزارش‌ها</a>
+        <a href="{% url 'notifications:list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-cream-50 font-bold">🔔 اعلان‌ها {% if notifications_unread %}<span class="bg-daneh-600 text-white text-xs px-2 rounded-full">{{ notifications_unread }}</span>{% endif %}</a>
+        <a href="{% url 'accounts:profile' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-cream-50 font-bold">👤 پروفایل</a>
+      </nav>
+    </aside>
+  {% endif %}
+
+  <div class="{% if user.is_authenticated %}flex-1 flex flex-col min-w-0{% else %}flex-1 flex flex-col{% endif %}">
+    {% if user.is_authenticated %}
+    <header class="sticky top-0 z-20 bg-white/90 backdrop-blur border-b border-zinc-100">
+      <div class="px-4 lg:px-6 h-[64px] flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <button onclick="openSidebar()" class="lg:hidden w-10 h-10 grid place-items-center rounded-xl border bg-white" aria-label="منو">☰</button>
+          <div class="hidden lg:flex items-center gap-2 text-xs text-zinc-500">{% include 'partials/breadcrumb.html' %}</div>
+          <span class="lg:hidden font-black text-[18px]">۱۰۰<span class="text-daneh-600">دانه</span></span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <a href="{% url 'classes:list' %}" class="hidden sm:inline-flex px-3.5 py-2 rounded-full hover:bg-cream-100 text-sm font-medium">کلاس‌ها</a>
+          <div class="relative" id="notifWrap">
+            <button id="notifBtn" aria-label="اعلان‌ها" class="relative p-2.5 rounded-full hover:bg-zinc-100 transition">
+              <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 15a2 2 0 002 2h8a2 2 0 002-2v-5a6 6 0 00-12 0v5Z"/><path d="M13.5 19a1.5 1.5 0 01-3 0"/><path d="M10 7.5a2 2 0 014 0"/></svg>
+              {% if notifications_unread %}<span class="absolute -top-0.5 -left-0.5 bg-daneh-600 text-white text-[11px] w-5 h-5 grid place-items-center rounded-full font-black border-2 border-white">{{ notifications_unread }}</span>{% endif %}
+            </button>
+            <div id="notifDrop" class="hidden absolute left-0 mt-2 w-[360px] bg-white rounded-2xl shadow-softLg border border-zinc-100 overflow-hidden">
+              <div class="p-3.5 flex justify-between items-center border-b bg-cream-50"><span class="font-black text-sm">اعلان‌ها</span><form method="post" action="{% url 'notifications:mark_all_read' %}">{% csrf_token %}<button class="text-xs text-daneh-600 font-bold">خواندن همه ✓</button></form></div>
+              <div class="max-h-[340px] overflow-auto divide-y divide-zinc-50">
+                {% for n in notifications_recent %}
+                <a href="{{ n.link|default:'#' }}" class="block px-4 py-3 hover:bg-cream-50 transition {% if not n.is_read %}bg-daneh-50/70{% endif %}">
+                  <div class="font-bold text-sm">{{ n.title }}</div><div class="text-xs text-zinc-600 line-clamp-1 mt-0.5">{{ n.message }}</div><div class="text-[11px] text-zinc-400 mt-1">{{ n.created_at|date:"H:i - Y/m/d" }}</div>
+                </a>
+                {% empty %}<div class="p-8 text-center"><div class="text-3xl">🍃</div><div class="text-sm text-zinc-400 mt-2">اعلان جدیدی ندارید</div></div>{% endfor %}
+              </div>
+              <a href="{% url 'notifications:list' %}" class="block text-center py-3 text-sm text-daneh-600 font-bold hover:bg-zinc-50 border-t">مشاهده همه →</a>
+            </div>
+          </div>
+          <div class="relative" id="avatarWrap">
+            <button id="avatarBtn" class="flex items-center gap-2 bg-cream-100 hover:bg-cream-100/80 rounded-full pl-2 pr-1 py-1 border border-zinc-100 transition">
+              {% if user.avatar %}<img src="{{ user.avatar.url }}" class="w-7 h-7 rounded-full object-cover">{% else %}<span class="w-7 h-7 rounded-full bg-daneh-600 text-white grid place-items-center text-xs font-black">{{ user.first_name|default:user.username|slice:":1" }}</span>{% endif %}
+              <span class="text-sm hidden sm:inline font-medium">{{ user.get_full_name|default:user.username }}</span><span class="text-zinc-400 text-xs">▾</span>
+            </button>
+            <div id="avatarDrop" class="hidden absolute left-0 mt-2 w-52 bg-white rounded-2xl shadow-softLg border p-2">
+              <div class="px-3 py-2 border-b mb-2"><div class="font-bold text-sm">{{ user.get_full_name|default:user.username }}</div><div class="text-xs text-zinc-500">{{ user.get_role_display }}</div></div>
+              <a href="{% url 'accounts:profile' %}" class="block px-3 py-2.5 rounded-xl hover:bg-zinc-50 text-sm">👤 پروفایل</a>
+              <a href="{% url 'accounts:dashboard' %}" class="block px-3 py-2.5 rounded-xl hover:bg-zinc-50 text-sm">📊 داشبورد</a>
+              <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="w-full text-right px-3 py-2.5 rounded-xl hover:bg-daneh-50 text-sm text-daneh-700 font-bold">🚪 خروج</button></form>
+            </div>
+          </div>
+          <button onclick="toggleDark()" aria-label="حالت تاریک" class="p-2.5 rounded-full border border-zinc-200 hover:bg-zinc-50"><span id="darkIcon">🌙</span></button>
+        </div>
+      </div>
+    </header>
+    {% else %}
+    <nav class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-zinc-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-[64px] items-center">
+          <a href="/" class="flex items-center gap-3">
+            <svg width="40" height="40" viewBox="0 0 40 40" class="shrink-0"><ellipse cx="20" cy="26" rx="14.5" ry="13.5" fill="#C22A4E" stroke="#851B37" stroke-width="1.3"/><path d="M13.5 9.5 L20 3.5 L26.5 9.5 L23 13.5 L17 13.5 Z" fill="#3E9B4F"/><g fill="#FFF9F2"><circle cx="20" cy="26" r="3.2"/><circle cx="15" cy="22" r="2.3"/><circle cx="25" cy="22" r="2.3"/><circle cx="15" cy="30" r="2.1"/><circle cx="25" cy="30" r="2.1"/></g></svg>
+            <span class="font-black text-[22px]">۱۰۰<span class="text-daneh-600">دانه</span></span><span class="hidden sm:inline-flex text-[11px] bg-daneh-100 text-daneh-700 px-2.5 py-1 rounded-full font-bold">🍃 انار دانش</span>
+          </a>
+          <div class="flex items-center gap-2">
+            <a href="{% url 'accounts:login' %}" class="px-5 py-2 rounded-full border bg-white text-sm font-bold hover:bg-zinc-50">ورود</a>
+            <a href="{% url 'accounts:register' %}" class="px-6 py-2.5 rounded-full bg-daneh-600 text-white text-sm font-black hover:bg-daneh-700 shadow-soft">ثبت‌نام رایگان</a>
+            <button onclick="toggleDark()" class="p-2.5 rounded-full border hover:bg-zinc-50"><span id="darkIcon2">🌙</span></button>
+          </div>
+        </div>
+      </div>
+    </nav>
+    {% endif %}
+
+    <main class="flex-1 {% if user.is_authenticated %}px-4 lg:px-8 py-6{% endif %}">
+      {% if messages %}
+      <div class="{% if user.is_authenticated %}mb-4{% else %}max-w-7xl mx-auto px-4 mt-4{% endif %} space-y-2" id="toastWrap">
+        {% for m in messages %}
+        <div class="toast rounded-2xl px-4 py-3 text-sm flex justify-between items-center border shadow-soft animate-[seedPop_.3s] {% if m.tags == 'success' %}bg-barg-50 text-green-900 border-green-200{% elif m.tags == 'error' %}bg-daneh-50 text-daneh-800 border-daneh-200{% else %}bg-cream-100 border-amber-200 text-amber-900{% endif %}">
+          <span class="flex items-center gap-2">{% if m.tags == 'success' %}✅{% elif m.tags == 'error' %}⚠️{% else %}💡{% endif %} {{ m }}</span><button onclick="this.closest('.toast').remove()" class="text-lg leading-none hover:opacity-70 px-2">×</button>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+
+    {% if user.is_authenticated %}
+    <footer class="bg-white border-t border-zinc-100 mt-auto">
+      <div class="px-4 lg:px-8 py-6 flex flex-col md:flex-row justify-between gap-4">
+        <div class="flex gap-3 items-center"><span class="w-8 h-8 rounded-xl bg-daneh-600 text-white grid place-items-center">🍎</span><div><div class="font-black text-sm">۱۰۰دانه</div><div class="text-xs text-zinc-500">هر کلاس، یک انار پر از دانه‌های دانش</div></div></div>
+        <div class="text-xs text-zinc-400 leading-6 text-left">© ۱۴۰۵ — سامانه ایرانی مدیریت کلاس<br>پشتیبانی: support@100dane.ir</div>
+      </div>
+      <div class="leaf-divider opacity-20 mx-4 lg:mx-8"></div>
+      <div class="px-4 lg:px-8 py-3 text-[11px] text-zinc-400 text-center">طراحی شده با انار • Vazirmatn • Tailwind • Django</div>
+    </footer>
+    {% else %}
+    <footer class="mt-12 bg-white border-t border-zinc-100">
+      <div class="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row justify-between gap-6">
+        <div class="flex gap-3 items-center"><span class="w-8 h-8 rounded-xl bg-daneh-600 text-white grid place-items-center">🍎</span><div><div class="font-black">۱۰۰دانه</div><div class="text-xs text-zinc-500">هر کلاس، یک انار پر از دانه‌های دانش</div></div></div>
+        <div class="text-xs text-zinc-400">© ۱۴۰۵ • ساخته شده با ❤️ برای ایران</div>
+      </div>
+    </footer>
+    {% endif %}
+  </div>
+</div>
+<div id="modalRoot" class="hidden fixed inset-0 z-50 grid place-items-center bg-black/40 backdrop-blur-sm p-4" onclick="if(event.target===this) closeModal()"></div>
+<script>
+const notifBtn=document.getElementById('notifBtn'), notifDrop=document.getElementById('notifDrop'), avatarBtn=document.getElementById('avatarBtn'), avatarDrop=document.getElementById('avatarDrop');
+notifBtn?.addEventListener('click',e=>{e.stopPropagation(); notifDrop.classList.toggle('hidden'); avatarDrop?.classList.add('hidden')});
+avatarBtn?.addEventListener('click',e=>{e.stopPropagation(); avatarDrop.classList.toggle('hidden'); notifDrop?.classList.add('hidden')});
+document.addEventListener('click',()=>{notifDrop?.classList.add('hidden'); avatarDrop?.classList.add('hidden')});
+notifDrop?.addEventListener('click',e=>e.stopPropagation()); avatarDrop?.addEventListener('click',e=>e.stopPropagation());
+function toggleDark(){ document.documentElement.classList.toggle('dark'); localStorage.setItem('dark', document.documentElement.classList.contains('dark')?'1':'0'); document.querySelectorAll('#darkIcon,#darkIcon2').forEach(el=>el&&(el.textContent=document.documentElement.classList.contains('dark')?'☀️':'🌙'));}
+if(localStorage.getItem('dark')==='1'){document.documentElement.classList.add('dark');}
+function openSidebar(){ document.getElementById('mobileSidebar').classList.remove('hidden'); document.getElementById('mobileSidebar').classList.add('flex'); document.getElementById('sidebarOverlay').classList.remove('hidden');}
+function closeSidebar(){ document.getElementById('mobileSidebar').classList.add('hidden'); document.getElementById('sidebarOverlay').classList.add('hidden');}
+function openModal(html){ const r=document.getElementById('modalRoot'); r.innerHTML=`<div class="bg-white rounded-[1.5rem] p-6 max-w-lg w-full shadow-softLg max-h-[85vh] overflow-auto relative">${html}<button onclick="closeModal()" class="absolute top-3 left-3 w-8 h-8 grid place-items-center rounded-full bg-zinc-100">×</button></div>`; r.classList.remove('hidden');}
+function closeModal(){ document.getElementById('modalRoot').classList.add('hidden');}
+document.body.addEventListener('htmx:configRequest', e=>{ e.detail.headers['X-CSRFToken']= '{{ csrf_token }}'; });
+setTimeout(()=>document.querySelectorAll('.toast').forEach(t=>t.style.opacity='.9'), 6000);
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

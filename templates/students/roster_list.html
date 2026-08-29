@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load persian %}
+{% block title %}فهرست دانش‌آموزان — {{ classroom.name }}{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto">
+  <div class="flex flex-wrap justify-between gap-4 items-center">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-2"><span class="w-10 h-10 rounded-2xl bg-daneh-100 grid place-items-center">🎓</span> دانش‌آموزان {{ classroom.name }}</h1>
+      <p class="text-sm text-zinc-500 mt-1">{{ classroom.get_grade_level_display }} • سال {{ classroom.academic_year|default:"—" }}</p>
+    </div>
+    <div class="flex gap-2">
+      <a href="{% url 'classes:detail' classroom.pk %}?tab=students" class="px-4 py-2 rounded-full border bg-white text-sm font-bold">← بازگشت</a>
+      <a href="{% url 'students:roster_create' classroom.pk %}" class="px-6 py-2.5 rounded-full bg-daneh-600 text-white text-sm font-black hover:bg-daneh-700 shadow-soft">+ افزودن دانش‌آموز</a>
+    </div>
+  </div>
+
+  <div class="mt-6 bg-white rounded-2xl shadow-soft border overflow-hidden">
+    <div class="p-4 border-b bg-zinc-50/50 flex justify-between items-center"><h3 class="font-black">فهرست کلاس — {{ students|length|fa_digits }} نفر</h3><a href="{% url 'scores:export' classroom.pk %}?mode=members" class="text-xs px-3 py-1 rounded-full border bg-white font-bold hover:bg-cream-50">📥 اکسل اعضا</a></div>
+    <div class="overflow-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-zinc-50"><tr><th class="p-3 text-right">ردیف</th><th class="p-3 text-right">نام</th><th class="p-3 text-right">نام خانوادگی</th><th class="p-3 text-right">کد</th><th class="p-3 text-right">موبایل</th><th class="p-3 text-center">عملیات</th></tr></thead>
+        <tbody>
+          {% for s in students %}
+          <tr class="border-t hover:bg-cream-50 transition">
+            <td class="p-3 font-mono">{{ forloop.counter|fa_digits }}</td>
+            <td class="p-3 font-bold">{{ s.first_name }}</td>
+            <td class="p-3">{{ s.last_name }}</td>
+            <td class="p-3 font-mono text-xs">{{ s.student_code|default:"—" }}</td>
+            <td class="p-3">{{ s.phone|default:"—" }}</td>
+            <td class="p-3 text-center flex gap-1 justify-center">
+              <a href="{% url 'students:roster_detail' s.pk %}" class="w-8 h-8 grid place-items-center rounded-xl border hover:bg-zinc-50">👁️</a>
+              <a href="{% url 'students:roster_edit' s.pk %}" class="w-8 h-8 grid place-items-center rounded-xl border hover:bg-zinc-50">✏️</a>
+              <a href="{% url 'students:roster_delete' s.pk %}" class="w-8 h-8 grid place-items-center rounded-xl border hover:bg-daneh-50 text-daneh-600">🗑️</a>
+            </td>
+          </tr>
+          {% empty %}<tr><td colspan="6" class="p-12 text-center"><div class="w-16 h-16 mx-auto rounded-2xl bg-cream-100 grid place-items-center text-2xl">🎓</div><div class="font-black mt-3">هنوز دانش‌آموزی در فهرست نیست</div><p class="text-sm text-zinc-500 mt-1">اولین دانش‌آموز را اضافه کنید.</p><a href="{% url 'students:roster_create' classroom.pk %}" class="inline-flex mt-4 px-6 py-2 rounded-full bg-daneh-600 text-white text-sm font-black">افزودن دانش‌آموز</a></td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

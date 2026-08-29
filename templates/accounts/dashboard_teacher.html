@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load persian %}
+{% block title %}داشبورد دبیر - ۱۰۰دانه{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex flex-wrap justify-between items-center gap-4">
+    <div><h1 class="text-2xl font-black">سلام، {{ user.first_name|default:user.username }} عزیز 👋</h1><p class="text-zinc-500 text-sm mt-1">نگاه کلی به کلاس‌هایت — امروز {{ now|date:"l" }} </p></div>
+    <a href="{% url 'classes:create' %}" class="px-6 py-3 rounded-full bg-daneh-600 text-white font-black hover:bg-daneh-700 shadow-soft hover:-translate-y-0.5 transition">+ کلاس جدید بسازید</a>
+  </div>
+  <div class="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-white rounded-2xl p-5 shadow-soft border hover:shadow-softLg transition"><div class="w-9 h-9 rounded-xl bg-daneh-100 grid place-items-center">🏫</div><div class="text-xs text-zinc-500 mt-3">تعداد کلاس‌ها</div><div class="text-3xl font-black mt-1">{{ classes_count|fa_digits }}</div><div class="text-xs text-daneh-600 mt-1">کلاس فعال</div></div>
+    <div class="bg-white rounded-2xl p-5 shadow-soft border hover:shadow-softLg transition"><div class="w-9 h-9 rounded-xl bg-barg-100 grid place-items-center">👥</div><div class="text-xs text-zinc-500 mt-3">دانش‌آموزان</div><div class="text-3xl font-black mt-1">{{ students_count|fa_digits }}</div><div class="text-xs text-barg-500 mt-1">نفر</div></div>
+    <div class="bg-white rounded-2xl p-5 shadow-soft border hover:shadow-softLg transition"><div class="w-9 h-9 rounded-xl bg-cream-100 grid place-items-center">⭐</div><div class="text-xs text-zinc-500 mt-3">میانگین کل</div><div class="text-3xl font-black mt-1">{% if avg_score %}{{ avg_score|fa_digits }}{% else %}—{% endif %}</div><div class="text-xs text-zinc-400 mt-1">از ۲۰</div></div>
+    <div class="bg-white rounded-2xl p-5 shadow-soft border hover:shadow-softLg transition"><div class="w-9 h-9 rounded-xl bg-gold-400/20 grid place-items-center">📝</div><div class="text-xs text-zinc-500 mt-3">آزمون‌ها</div><div class="text-3xl font-black mt-1">{{ exams_count|fa_digits }}</div><div class="text-xs text-amber-600 mt-1">آزمون</div></div>
+  </div>
+  <div class="mt-8 grid lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2">
+      <div class="flex justify-between items-center"><h2 class="font-black">کلاس‌های من</h2><a href="{% url 'classes:list' %}" class="text-sm text-daneh-600 font-bold">همه →</a></div>
+      <div class="mt-4 grid sm:grid-cols-2 gap-4">
+        {% for c in classes %}
+        <a href="{% url 'classes:detail' c.pk %}" class="bg-white rounded-2xl p-5 shadow-soft border hover:-translate-y-1 hover:shadow-softLg transition block group">
+          <div class="flex justify-between items-start"><span class="w-10 h-10 rounded-xl grid place-items-center text-white shadow-sm" style="background: {{ c.color }}">🍎</span><span class="text-xs bg-cream-100 px-2.5 py-1 rounded-full font-bold">{{ c.get_grade_level_display }}</span></div>
+          <div class="font-black mt-3 group-hover:text-daneh-600 transition">{{ c.name }}</div><div class="text-xs text-zinc-500 mt-1">{{ c.students_count }} دانش‌آموز • کد: <span class="font-mono font-bold">{{ c.invite_code }}</span></div>
+          <div class="mt-3 w-full bg-zinc-100 rounded-full h-1.5"><div class="h-1.5 rounded-full bg-daneh-600 transition-all" style="width: {% widthratio c.students_count 30 100 %}%"></div></div>
+        </a>
+        {% empty %}<div class="col-span-2 bg-white rounded-2xl p-10 text-center text-zinc-400 border-2 border-dashed"><div class="text-4xl">🏫</div><div class="mt-2">هنوز کلاسی نساخته‌اید.</div><a href="{% url 'classes:create' %}" class="text-daneh-600 font-black">اولین کلاس را بسازید →</a></div>{% endfor %}
+      </div>
+      <!-- quick actions -->
+      <div class="mt-6 bg-white rounded-2xl p-5 shadow-soft border">
+        <h3 class="font-black text-sm">دسترسی سریع</h3>
+        <div class="mt-3 grid grid-cols-3 gap-3 text-center">
+          <a href="{% url 'classes:create' %}" class="p-3 rounded-2xl bg-cream-50 hover:bg-cream-100 border transition"><div class="text-xl">➕</div><div class="text-xs font-bold mt-1">کلاس جدید</div></a>
+          <a href="{% url 'classes:list' %}" class="p-3 rounded-2xl bg-daneh-50 hover:bg-daneh-100 border border-daneh-100 transition"><div class="text-xl">📋</div><div class="text-xs font-bold mt-1">لیست کلاس‌ها</div></a>
+          <a href="{% url 'notifications:list' %}" class="p-3 rounded-2xl bg-barg-100 hover:bg-green-50 border border-green-100 transition"><div class="text-xl">🔔</div><div class="text-xs font-bold mt-1">اعلان‌ها</div></a>
+        </div>
+      </div>
+    </div>
+    <div class="space-y-6">
+      <div class="bg-white rounded-2xl p-5 shadow-soft border">
+        <h3 class="font-black">آزمون‌های اخیر</h3>
+        <div class="mt-4 space-y-3">
+          {% for e in recent_exams %}
+          <a href="{% url 'exams:detail' e.pk %}" class="flex justify-between items-center p-3 rounded-xl bg-cream-50 hover:bg-cream-100 border border-cream-100 transition"><div><div class="font-bold text-sm">{{ e.title }}</div><div class="text-xs text-zinc-500">{{ e.classroom.name }}</div></div><span class="text-xs bg-white px-2.5 py-1 rounded-full border font-bold">{{ e.get_exam_type_display }}</span></a>
+          {% empty %}<div class="text-sm text-zinc-400 text-center py-6 border-2 border-dashed rounded-2xl">آزمونی ثبت نشده</div>{% endfor %}
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl p-5 shadow-soft border">
+        <h3 class="font-black">اعلان‌ها</h3>
+        <div class="mt-3 space-y-2">
+          {% for n in recent_notifications %}
+          <div class="text-sm p-3 rounded-xl border {% if not n.is_read %}bg-daneh-50 border-daneh-100{% else %}bg-zinc-50 border-zinc-100{% endif %}"><div class="font-bold text-xs">{{ n.title }}</div><div class="text-xs text-zinc-600 truncate mt-1">{{ n.message }}</div></div>
+          {% empty %}<div class="text-xs text-zinc-400 text-center py-4">اعلان جدیدی نیست 🍃</div>{% endfor %}
+        </div>
+        <a href="{% url 'notifications:list' %}" class="block text-center mt-3 text-xs text-daneh-600 font-bold">مشاهده همه →</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

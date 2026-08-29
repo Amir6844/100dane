@@ -1,0 +1,6 @@
+<div class="bg-white rounded-2xl p-10 text-center border-2 border-dashed border-zinc-100">
+  <div class="w-16 h-16 mx-auto rounded-2xl bg-cream-100 grid place-items-center text-2xl">{{ icon|default:"🍃" }}</div>
+  <h3 class="font-black mt-4">{{ title }}</h3>
+  <p class="text-sm text-zinc-500 mt-1 max-w-md mx-auto leading-6">{{ message }}</p>
+  {% if action_url %}<a href="{{ action_url }}" class="inline-flex mt-4 px-6 py-2.5 rounded-full bg-daneh-600 text-white text-sm font-black hover:bg-daneh-700 shadow-soft">{{ action_label }}</a>{% endif %}
+</div>

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}ثبت‌نام - ۱۰۰دانه{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-10 grid lg:grid-cols-2 gap-8 items-center">
+  <div class="bg-white rounded-[2rem] p-8 shadow-softLg border border-zinc-100">
+    <h1 class="text-2xl font-black">ایجاد حساب جدید 🌱</h1><p class="text-zinc-500 mt-2 text-sm">به خانواده ۱۰۰دانه بپیوندید — کمتر از یک دقیقه</p>
+    <form method="post" class="mt-6 space-y-4">{% csrf_token %}
+      {% for field in form %}
+        <div><label class="text-sm font-bold">{{ field.label }}</label><div class="mt-1.5">{{ field }}</div>{% if field.errors %}<div class="text-xs text-daneh-600 mt-1">{{ field.errors.0 }}</div>{% endif %}{% if field.help_text %}<div class="text-[11px] text-zinc-400 mt-1">{{ field.help_text }}</div>{% endif %}</div>
+      {% endfor %}
+      <button class="w-full py-3.5 rounded-full bg-daneh-600 text-white font-black hover:bg-daneh-700 shadow-soft">ایجاد حساب</button>
+      <div class="text-center text-xs">حساب دارید؟ <a href="{% url 'accounts:login' %}" class="text-daneh-600 font-black">ورود</a></div>
+    </form>
+  </div>
+  <div class="hidden lg:block">
+    <div class="bg-gradient-to-br from-barg-500 to-emerald-700 rounded-[2rem] p-10 text-white relative overflow-hidden">
+      <div class="seed-pattern absolute inset-0"></div>
+      <div class="relative">
+        <div class="text-6xl">🌿</div>
+        <h2 class="text-3xl font-black mt-4 leading-9">نقش خود را<br>انتخاب کنید</h2>
+        <div class="mt-6 grid grid-cols-2 gap-4">
+          <div class="bg-white text-ink-900 rounded-2xl p-4 shadow-soft"><div class="font-black">👩‍🏫 دبیر</div><div class="text-xs text-zinc-600 mt-1 leading-4">مدیریت کلاس، آزمون و نمرات</div><div class="text-[11px] text-barg-500 font-bold mt-2">+ کد دعوت اختصاصی</div></div>
+          <div class="bg-white text-ink-900 rounded-2xl p-4 shadow-soft"><div class="font-black">🎓 دانش‌آموز</div><div class="text-xs text-zinc-600 mt-1 leading-4">پیوستن با کد دعوت، کارنامه</div><div class="text-[11px] text-daneh-600 font-bold mt-2">+ گروه‌بندی</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

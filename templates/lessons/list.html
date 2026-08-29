@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load persian %}
+{% block title %}درس‌ها — {{ classroom.name }}{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto">
+  <div class="flex flex-wrap justify-between gap-4 items-center">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-2"><span class="w-10 h-10 rounded-2xl bg-cream-100 grid place-items-center">📖</span> درس‌های {{ classroom.name }}</h1>
+      <p class="text-sm text-zinc-500 mt-1">محتوای آموزشی کلاس — هر درس یک دانه دانش</p>
+    </div>
+    <div class="flex gap-2">
+      <a href="{% url 'classes:detail' classroom.pk %}?tab=lessons" class="px-4 py-2 rounded-full border bg-white text-sm font-bold hover:bg-zinc-50">← بازگشت به کلاس</a>
+      {% if user == classroom.teacher %}<a href="{% url 'lessons:create' classroom.pk %}" class="px-6 py-2.5 rounded-full bg-daneh-600 text-white text-sm font-black hover:bg-daneh-700 shadow-soft">+ درس جدید</a>{% endif %}
+    </div>
+  </div>
+
+  <div class="mt-6 space-y-3">
+    {% for l in lessons %}
+    <a href="{% url 'lessons:detail' l.pk %}" class="block bg-white rounded-2xl p-5 shadow-soft border hover:shadow-softLg hover:-translate-y-0.5 transition group">
+      <div class="flex justify-between items-start gap-4">
+        <div class="flex gap-4">
+          <span class="w-11 h-11 rounded-xl bg-cream-100 group-hover:bg-cream-200 grid place-items-center text-lg transition">📖</span>
+          <div>
+            <div class="font-black group-hover:text-daneh-600 transition">{{ l.title }}</div>
+            <div class="text-sm text-zinc-500 mt-1 line-clamp-2 leading-5">{{ l.description|truncatewords:22|default:"بدون توضیح" }}</div>
+            <div class="text-xs text-zinc-400 mt-2 flex flex-wrap gap-2 items-center"><span>{% if l.date %}{{ l.date }}{% elif l.lesson_date %}{{ l.lesson_date }}{% else %}بدون تاریخ{% endif %}</span><span>•</span><span>ترتیب {{ l.order|fa_digits }}</span>{% if l.group %}<span class="bg-barg-100 text-green-700 px-2 py-0.5 rounded-full">{{ l.group.name }}</span>{% endif %}{% if l.homework %}<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">تکلیف دارد</span>{% endif %}</div>
+          </div>
+        </div>
+        <span class="hidden sm:inline-flex w-8 h-8 rounded-full border grid place-items-center group-hover:bg-daneh-600 group-hover:text-white transition">→</span>
+      </div>
+    </a>
+    {% empty %}
+    <div class="bg-white rounded-2xl p-12 text-center border-2 border-dashed">
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-cream-100 grid place-items-center text-2xl">🍃</div>
+      <h3 class="font-black mt-4">هنوز درسی ثبت نشده</h3>
+      <p class="text-sm text-zinc-500 mt-1">اولین جلسه درسی کلاس را ایجاد کنید.</p>
+      {% if user == classroom.teacher %}<a href="{% url 'lessons:create' classroom.pk %}" class="inline-flex mt-4 px-6 py-2.5 rounded-full bg-daneh-600 text-white font-black">ایجاد درس</a>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

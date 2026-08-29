@@ -1,0 +1,6 @@
+<div>
+  <label class="text-sm font-black text-zinc-700">{{ label }}</label>
+  <div class="mt-1.5">{{ field }}</div>
+  {% if help %}<div class="text-[11px] text-zinc-400 mt-1">{{ help }}</div>{% endif %}
+  {% if errors %}<div class="text-xs text-daneh-600 bg-daneh-50 border border-daneh-100 rounded-xl px-3 py-2 mt-1.5">{{ errors }}</div>{% endif %}
+</div>

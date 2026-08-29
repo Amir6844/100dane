@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load persian %}
+{% block title %}ثبت نمرات - {{ exam.title }}{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="bg-white rounded-[2rem] p-6 shadow-soft border flex flex-wrap justify-between gap-4 items-center">
+    <div><h1 class="text-xl font-black">📝 ثبت نمرات: {{ exam.title }}</h1><p class="text-sm text-zinc-500">کلاس {{ classroom.name }} • از {{ exam.total_score|fa_digits }} نمره • مقیاس ۰–۲۰ ایرانی</p></div>
+    <div class="flex gap-2"><a href="{% url 'classes:detail' classroom.pk %}?tab=exams" class="px-5 py-2 rounded-full border bg-white text-sm font-bold">بازگشت</a><a href="{% url 'scores:export' classroom.pk %}?mode=exam&exam={{ exam.pk }}" class="px-5 py-2 rounded-full bg-cream-100 text-sm font-bold">📥 اکسل این آزمون</a></div>
+  </div>
+
+  <form method="post" id="bulkForm" class="mt-6 bg-white rounded-2xl shadow-soft border overflow-hidden">{% csrf_token %}
+    <div class="overflow-auto max-h-[60vh]">
+      <table class="w-full text-sm">
+        <thead class="bg-zinc-50 sticky top-0 z-10"><tr><th class="p-3 text-right">ردیف</th><th class="p-3 text-right">دانش‌آموز</th><th class="p-3 text-center">نمره (۰–{{ exam.total_score|fa_digits }})</th><th class="p-3 text-center">پیش‌نمایش</th></tr></thead>
+        <tbody>
+          {% for s in students %}
+          {% with sc=scores_map|dict_get:s.id %}
+          <tr class="border-t hover:bg-cream-50 transition">
+            <td class="p-3 font-mono">{{ forloop.counter|fa_digits }}</td>
+            <td class="p-3 font-bold">{{ s.get_full_name|default:s.username }} <span class="text-xs text-zinc-400 font-mono">{{ s.username }}</span></td>
+            <td class="p-3 text-center"><input type="number" name="score_{{ s.id }}" value="{% if sc %}{{ sc.value }}{% endif %}" min="0" max="{{ exam.total_score }}" step="0.25" placeholder="—" class="w-28 rounded-xl border border-zinc-200 px-3 py-2 text-center focus:ring-2 focus:ring-daneh-500 outline-none score-input font-mono"></td>
+            <td class="p-3 text-center"><div class="w-24 h-2.5 bg-zinc-100 rounded-full mx-auto overflow-hidden"><div id="bar-{{ s.id }}" class="h-2.5 rounded-full transition-all" style="width: 0%; background: #9CA3AF"></div></div><span id="label-{{ s.id }}" class="text-xs font-mono text-zinc-500">—</span></td>
+          </tr>
+          {% endwith %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="sticky bottom-0 bg-white border-t p-4 flex flex-wrap justify-between items-center gap-3">
+      <div class="text-sm flex items-center gap-3"><span>میانگین کلاس:</span> <span id="classAvg" class="font-black text-lg">—</span> <span class="text-xs text-zinc-400">زنده</span> <span id="avgDot" class="w-3 h-3 rounded-full bg-zinc-200"></span></div>
+      <div class="flex gap-2"><button type="button" onclick="autoFill()" class="px-4 py-2 rounded-full border text-sm font-bold hover:bg-zinc-50">پر کردن نمونه</button><button id="saveBtn" class="px-8 py-3 rounded-full bg-daneh-600 text-white font-black hover:bg-daneh-700 shadow-soft flex items-center gap-2">💾 ذخیره نمرات</button></div>
+    </div>
+  </form>
+  <div id="burst" class="pointer-events-none fixed inset-0 hidden"></div>
+</div>
+
+<script>
+function persianDigits(n){return String(n).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);}
+function colorFor(v){if(v>=17) return '#3E9B4F'; if(v>=12) return '#E8B54A'; return '#C22A4E';}
+function updateBars(){
+  let sum=0,cnt=0;
+  document.querySelectorAll('.score-input').forEach(inp=>{
+    const v=parseFloat(inp.value.replace('٫','.').replace('،','.')); const id=inp.dataset.student;
+    const bar=document.getElementById('bar-'+id); const label=document.getElementById('label-'+id);
+    if(!isNaN(v)){
+      const pct=Math.min(100,(v/parseFloat("{{ exam.total_score }}"))*100);
+      bar.style.width=pct+'%'; bar.style.background=colorFor(v);
+      label.textContent=persianDigits(v); label.style.color=colorFor(v);
+      sum+=v; cnt++;
+      inp.classList.toggle('border-daneh-500', v<0 || v>parseFloat("{{ exam.total_score }}"));
+      inp.classList.toggle('bg-daneh-50', v<0 || v>parseFloat("{{ exam.total_score }}"));
+    } else { bar.style.width='0%'; label.textContent='—'; label.style.color='#9CA3AF';}
+  });
+  const avg=cnt?(sum/cnt).toFixed(2):'—';
+  document.getElementById('classAvg').textContent=cnt?persianDigits(avg):'—';
+  document.getElementById('avgDot').style.background=cnt?colorFor(parseFloat(avg)):'#E5E7EB';
+}
+document.querySelectorAll('.score-input').forEach(inp=>inp.addEventListener('input',updateBars));
+updateBars();
+function autoFill(){document.querySelectorAll('.score-input').forEach(inp=>{if(!inp.value) inp.value=(Math.random()*8+12).toFixed(1);});updateBars();}
+document.getElementById('bulkForm').addEventListener('submit',e=>{
+  const btn=document.getElementById('saveBtn'); btn.innerHTML='<span class="pom-spinner w-4 h-4 border-white border-t-transparent"></span> در حال ذخیره...'; btn.disabled=true;
+  // seed burst confetti
+  const burst=document.getElementById('burst'); burst.classList.remove('hidden'); burst.innerHTML='';
+  for(let i=0;i<18;i++){ const s=document.createElement('span'); s.textContent='🔴'; s.style.position='fixed'; s.style.left='50%'; s.style.top='60%'; s.style.setProperty('--x',(Math.random()*400-200)+'px'); s.style.setProperty('--y',(Math.random()*300-150)+'px'); s.style.animation='seedBurst .7s forwards'; s.style.fontSize='14px'; burst.appendChild(s);}
+  setTimeout(()=>burst.classList.add('hidden'),800);
+});
+</script>
+{% endblock %}

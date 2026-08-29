@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}۵۰۰ — خطای سرور{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto py-16 text-center">
+  <div class="bg-white rounded-[2rem] p-10 shadow-soft border relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-full h-1 bg-amber-500"></div>
+    <div class="w-20 h-20 mx-auto rounded-[1.5rem] bg-amber-100 grid place-items-center text-3xl">⚠️</div>
+    <h1 class="text-3xl font-black mt-4">۵۰۰ — خطایی رخ داد</h1>
+    <p class="text-zinc-500 mt-2 leading-6">متأسفانه مشکلی در سرور پیش آمده.<br>تیم فنی به زودی آن را برطرف می‌کند.</p>
+    <div class="mt-6 flex gap-3 justify-center">
+      <a href="/" class="px-6 py-3 rounded-full bg-daneh-600 text-white font-black">تلاش مجدد</a>
+      <a href="{% url 'accounts:dashboard' %}" class="px-6 py-3 rounded-full border bg-white font-bold">داشبورد</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% load static %}
+<aside id="sidebar" class="hidden lg:flex w-[285px] shrink-0 flex-col bg-white border-l border-zinc-100 sticky top-0 h-screen overflow-hidden">
+  <!-- brand -->
+  <div class="px-6 py-6 flex items-center gap-3 border-b border-zinc-50">
+    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-daneh-600 to-daneh-700 grid place-items-center shadow-soft">
+      <svg width="26" height="26" viewBox="0 0 40 40"><ellipse cx="20" cy="26" rx="12" ry="11" fill="white"/><path d="M14 9 L20 4 L26 9 L22 13 L18 13 Z" fill="#3E9B4F"/><g fill="#C22A4E"><circle cx="20" cy="26" r="2.8"/><circle cx="15.5" cy="22.5" r="1.9"/><circle cx="24.5" cy="22.5" r="1.9"/></g></svg>
+    </div>
+    <div>
+      <div class="font-black text-[18px] leading-none">۱۰۰<span class="text-daneh-600">دانه</span></div>
+      <div class="text-[11px] text-zinc-500 font-medium tracking-wide">سامانه مدیریت آموزشی</div>
+    </div>
+    <span class="mr-auto text-[10px] bg-daneh-100 text-daneh-700 px-2 py-1 rounded-full font-black">۱۴۰۵</span>
+  </div>
+
+  <!-- nav -->
+  <nav class="flex-1 overflow-auto px-3 py-4 space-y-1 scrollbar-thin">
+    <div class="text-[11px] font-black text-zinc-400 px-3 py-2 tracking-widest">منو</div>
+
+    <a href="{% url 'accounts:dashboard' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold {% if request.resolver_match.url_name == 'dashboard' %}bg-daneh-600 text-white shadow-soft{% else %}hover:bg-cream-50 text-zinc-700{% endif %} transition">
+      <span class="w-8 h-8 rounded-lg grid place-items-center {% if request.resolver_match.url_name == 'dashboard' %}bg-white/20{% else %}bg-zinc-100{% endif %}">📊</span> داشبورد
+      {% if request.resolver_match.url_name == 'dashboard' %}<span class="mr-auto w-2 h-2 bg-white rounded-full"></span>{% endif %}
+    </a>
+
+    <a href="{% url 'classes:list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold {% if 'classes' in request.path %}bg-cream-50 border border-cream-100 text-daneh-700{% else %}hover:bg-cream-50 text-zinc-700{% endif %} transition">
+      <span class="w-8 h-8 rounded-lg grid place-items-center bg-daneh-100 text-daneh-700">🏫</span> کلاس‌ها
+      <span class="mr-auto text-xs bg-white border px-2 py-0.5 rounded-full font-mono">{{ request.user.owned_classes.count|default:"" }}</span>
+    </a>
+
+    <a href="{% url 'scores:my_scores' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold hover:bg-cream-50 text-zinc-700 transition">
+      <span class="w-8 h-8 rounded-lg grid place-items-center bg-barg-100 text-green-700">📝</span> نمرات و کارنامه
+    </a>
+
+    <a href="{% url 'reports' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold {% if 'reports' in request.path %}bg-cream-50 border border-cream-100 text-daneh-700{% else %}hover:bg-cream-50 text-zinc-700{% endif %} transition">
+      <span class="w-8 h-8 rounded-lg grid place-items-center bg-gold-400/20 text-amber-700">📊</span> گزارش‌ها
+    </a>
+
+    <a href="{% url 'notifications:list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold hover:bg-cream-50 text-zinc-700 transition">
+      <span class="w-8 h-8 rounded-lg grid place-items-center bg-amber-50 text-amber-700">🔔</span> اعلان‌ها
+      {% if notifications_unread %}<span class="mr-auto bg-daneh-600 text-white text-xs px-2 py-0.5 rounded-full font-black">{{ notifications_unread }}</span>{% endif %}
+    </a>
+
+    <div class="text-[11px] font-black text-zinc-400 px-3 py-2 mt-4 tracking-widest">کلاس فعال</div>
+    {% if request.user.is_teacher %}
+      {% for c in request.user.owned_classes.all|slice:":3" %}
+        <a href="{% url 'classes:detail' c.pk %}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm hover:bg-zinc-50 border border-transparent hover:border-zinc-100 transition">
+          <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background: {{ c.color }}"></span>
+          <span class="truncate font-medium">{{ c.name }}</span>
+          <span class="mr-auto text-xs text-zinc-400">{{ c.students_count }}</span>
+        </a>
+      {% empty %}
+        <div class="px-3 py-2 text-xs text-zinc-400">هنوز کلاسی نساخته‌اید</div>
+      {% endfor %}
+      <a href="{% url 'classes:create' %}" class="flex items-center gap-2 px-3 py-2 text-xs font-black text-daneh-600 hover:bg-daneh-50 rounded-xl mt-1">➕ ایجاد کلاس جدید</a>
+    {% else %}
+      {% for c in request.user.enrolled_classes.all|slice:":3" %}
+        <a href="{% url 'classes:detail' c.pk %}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm hover:bg-zinc-50 transition">
+          <span class="w-2.5 h-2.5 rounded-full" style="background: {{ c.color }}"></span>
+          <span class="truncate">{{ c.name }}</span>
+        </a>
+      {% endfor %}
+    {% endif %}
+
+    <div class="mt-6 p-3 rounded-2xl bg-gradient-to-br from-daneh-600 to-daneh-700 text-white relative overflow-hidden">
+      <div class="seed-pattern absolute inset-0 opacity-20"></div>
+      <div class="relative">
+        <div class="text-sm font-black">هر دانه، یک قدم 🌟</div>
+        <div class="text-xs text-white/80 mt-1 leading-4">میانگین بالای ۱۷ = ممتاز<br>مثل اناری پر از دانه!</div>
+        <a href="{% url 'classes:list' %}" class="mt-3 inline-flex px-3 py-1.5 rounded-full bg-white text-daneh-700 text-xs font-black">دیدن کلاس‌ها ←</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- user -->
+  <div class="p-3 border-t border-zinc-100 bg-cream-50/50">
+    <div class="flex items-center gap-3 p-2 rounded-xl bg-white border shadow-sm">
+      {% if user.avatar %}<img src="{{ user.avatar.url }}" class="w-9 h-9 rounded-xl object-cover">{% else %}<span class="w-9 h-9 rounded-xl bg-daneh-600 text-white grid place-items-center font-black">{{ user.first_name|default:user.username|slice:":1" }}</span>{% endif %}
+      <div class="flex-1 min-w-0">
+        <div class="text-sm font-black truncate">{{ user.get_full_name|default:user.username }}</div>
+        <div class="text-xs text-zinc-500 truncate">{{ user.get_role_display }}</div>
+      </div>
+      <a href="{% url 'accounts:profile' %}" class="w-8 h-8 grid place-items-center rounded-lg border hover:bg-zinc-50">⚙️</a>
+    </div>
+    <div class="leaf-divider mt-3 opacity-20"></div>
+    <div class="text-[11px] text-zinc-400 text-center mt-2">۱۰۰دانه • انار دانش • ۱۴۰۵</div>
+  </div>
+</aside>

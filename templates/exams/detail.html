@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load persian %}
+{% block title %}{{ exam.title }} — {{ exam.classroom.name }}{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto">
+  <a href="{% url 'classes:detail' exam.classroom.pk %}?tab=exams" class="inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-daneh-600">← بازگشت به آزمون‌ها</a>
+  <div class="mt-4 bg-white rounded-[2rem] p-8 shadow-soft border relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-daneh-600 to-barg-500"></div>
+    <div class="flex flex-wrap justify-between gap-4">
+      <div>
+        <span class="text-xs px-2.5 py-1 rounded-full bg-daneh-100 text-daneh-700 font-black">{{ exam.get_exam_type_display }}</span>
+        <h1 class="text-2xl font-black mt-2">{{ exam.title }}</h1>
+        <p class="text-sm text-zinc-500 mt-1">کلاس {{ exam.classroom.name }} • از {{ exam.total_score|fa_digits }} نمره • {% if exam.group %}گروه {{ exam.group.name }}{% else %}همه دانش‌آموزان{% endif %}{% if exam.lesson %} • {{ exam.lesson.title }}{% endif %}</p>
+      </div>
+      <div class="flex gap-2 self-start">
+        {% if user == exam.classroom.teacher %}
+          <a href="{% url 'scores:bulk' exam.pk %}" class="px-5 py-2.5 rounded-full bg-barg-500 text-white text-sm font-black hover:bg-green-700 shadow-soft">📝 ثبت نمرات</a>
+          <a href="{% url 'exams:edit' exam.pk %}" class="px-4 py-2 rounded-full border bg-white text-sm font-bold">✏️ ویرایش</a>
+          <a href="{% url 'exams:delete' exam.pk %}" class="px-4 py-2 rounded-full border bg-white text-sm text-daneh-600 font-bold">حذف</a>
+        {% endif %}
+      </div>
+    </div>
+    {% if exam.description %}<div class="mt-4 p-4 bg-cream-50 rounded-2xl border text-sm leading-7">{{ exam.description|linebreaks }}</div>{% endif %}
+
+    <div class="mt-6 grid grid-cols-3 gap-3 text-center">
+      <div class="bg-zinc-50 rounded-2xl p-4 border"><div class="text-xs text-zinc-500">حداکثر</div><div class="text-xl font-black">{{ exam.total_score|fa_digits }}</div></div>
+      <div class="bg-zinc-50 rounded-2xl p-4 border"><div class="text-xs text-zinc-500">شرکت‌کنندگان</div><div class="text-xl font-black">{{ scores|length|fa_digits }}</div></div>
+      <div class="bg-zinc-50 rounded-2xl p-4 border"><div class="text-xs text-zinc-500">نوع</div><div class="text-sm font-black mt-1">{{ exam.get_exam_type_display }}</div></div>
+    </div>
+
+    <div class="mt-6 flex gap-2">
+      <a href="{% url 'scores:export' exam.classroom.pk %}?mode=exam&exam={{ exam.pk }}" class="px-5 py-2.5 rounded-full bg-daneh-600 text-white text-sm font-black hover:bg-daneh-700 shadow-soft">📥 خروجی اکسل این آزمون</a>
+      <span class="text-xs text-zinc-400 self-center">با هدرهای فارسی: ردیف، نام، نمره، درصد…</span>
+    </div>
+  </div>
+
+  <div class="mt-6 bg-white rounded-2xl shadow-soft border overflow-hidden">
+    <div class="p-4 flex justify-between items-center border-b bg-zinc-50/50"><h3 class="font-black">نتایج ({{ scores|length|fa_digits }})</h3><span class="text-xs text-zinc-500">نمودار میله‌ای بر اساس درصد</span></div>
+    <div class="overflow-auto max-h-[50vh]">
+      <table class="w-full text-sm">
+        <thead class="bg-zinc-50 sticky top-0"><tr><th class="p-3 text-right">ردیف</th><th class="p-3 text-right">دانش‌آموز</th><th class="p-3 text-center">نمره</th><th class="p-3">درصد</th><th class="p-3 text-center">وضعیت</th></tr></thead>
+        <tbody>
+          {% for s in scores %}
+          <tr class="border-t hover:bg-cream-50 transition">
+            <td class="p-3 font-mono">{{ forloop.counter|fa_digits }}</td>
+            <td class="p-3 font-bold">{{ s.student.get_full_name|default:s.student.username }}</td>
+            <td class="p-3 text-center"><span class="px-3 py-1 rounded-full text-white text-xs font-black" style="background: {{ s.value|avg_color }}">{{ s.value|fa_digits }}</span></td>
+            <td class="p-3"><div class="w-full bg-zinc-100 rounded-full h-2.5 overflow-hidden"><div class="h-2.5 rounded-full" style="width: {% widthratio s.value exam.total_score 100 %}%; background: {{ s.value|avg_color }}"></div></div></td>
+            <td class="p-3 text-center text-xs">{% if s.value >= 17 %}ممتاز{% elif s.value >= 12 %}قابل قبول{% else %}نیاز به تلاش{% endif %}</td>
+          </tr>
+          {% empty %}<tr><td colspan="5" class="p-10 text-center text-zinc-400">هنوز نمره‌ای ثبت نشده — از دکمه ثبت نمرات شروع کنید 🍃</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}اعلان‌ها — ۱۰۰دانه{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto">
+  <div class="flex flex-wrap justify-between gap-4 items-center">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-2"><span class="w-10 h-10 rounded-2xl bg-amber-100 grid place-items-center">🔔</span> اعلان‌ها</h1>
+      <p class="text-sm text-zinc-500 mt-1">آخرین رویدادهای کلاس‌های شما</p>
+    </div>
+    <form method="post" action="{% url 'notifications:mark_all_read' %}">{% csrf_token %}<button class="px-5 py-2.5 rounded-full border bg-white text-sm font-bold hover:bg-zinc-50">✓ خواندن همه</button></form>
+  </div>
+  <div class="mt-6 space-y-3">
+    {% for n in notifications %}
+    <div class="bg-white rounded-2xl p-5 shadow-soft border flex justify-between gap-4 items-start {% if not n.is_read %}border-amber-200 bg-amber-50/50{% endif %}">
+      <div class="flex gap-3">
+        <span class="w-10 h-10 rounded-xl {% if not n.is_read %}bg-amber-500 text-white{% else %}bg-zinc-100 text-zinc-500{% endif %} grid place-items-center text-sm">🔔</span>
+        <div>
+          <div class="font-black text-sm">{{ n.title }}</div>
+          <div class="text-sm text-zinc-600 mt-1 leading-5">{{ n.message }}</div>
+          <div class="text-xs text-zinc-400 mt-2">{{ n.created_at|date:"Y/m/d H:i" }}</div>
+          {% if n.link %}<a href="{{ n.link }}" class="inline-flex mt-2 text-xs px-3 py-1 rounded-full bg-daneh-50 text-daneh-700 font-bold hover:bg-daneh-100">مشاهده →</a>{% endif %}
+        </div>
+      </div>
+      <div class="shrink-0">
+        {% if not n.is_read %}<form method="post" action="{% url 'notifications:mark_read' n.pk %}">{% csrf_token %}<button class="text-xs px-3 py-1.5 rounded-full bg-white border font-bold hover:bg-zinc-50">خواندم</button></form>{% else %}<span class="text-xs bg-zinc-100 px-2 py-1 rounded-full text-zinc-500">خوانده شده</span>{% endif %}
+      </div>
+    </div>
+    {% empty %}
+    <div class="bg-white rounded-2xl p-12 text-center border-2 border-dashed">
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-cream-100 grid place-items-center text-2xl">🍃</div>
+      <h3 class="font-black mt-3">اعلانی ندارید</h3>
+      <p class="text-sm text-zinc-500 mt-1">رویدادهای جدید اینجا نمایش داده می‌شود.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

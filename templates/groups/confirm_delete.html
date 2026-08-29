@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}حذف گروه{% endblock %}
+{% block content %}
+<div class="max-w-lg mx-auto mt-8">
+  <div class="bg-white rounded-[2rem] p-8 shadow-softLg border text-center relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-full h-1 bg-daneh-600"></div>
+    <div class="w-16 h-16 mx-auto rounded-2xl bg-daneh-100 grid place-items-center text-2xl">⚠️</div>
+    <h1 class="text-xl font-black mt-4">حذف گروه «{{ object.name }}»؟</h1>
+    <p class="text-sm text-zinc-500 mt-2 leading-6">آیا از حذف این گروه مطمئن هستید؟<br>اعضای گروه حذف نمی‌شوند، فقط گروه از لیست کلاس پاک می‌شود.</p>
+    <form method="post" class="mt-6 flex gap-3 justify-center">{% csrf_token %}
+      <button class="px-8 py-3 rounded-full bg-daneh-600 text-white font-black hover:bg-daneh-700 shadow-soft">بله، حذف شود</button>
+      <a href="{% url 'classes:detail' object.classroom.pk %}?tab=groups" class="px-8 py-3 rounded-full border bg-white font-bold hover:bg-zinc-50">انصراف</a>
+    </form>
+  </div>
+</div>
+{% endblock %}
